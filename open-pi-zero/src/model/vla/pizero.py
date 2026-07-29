@@ -424,6 +424,7 @@ class PiZero(nn.Module, NoSyncBase):
         action_position_ids: torch.LongTensor,
         proprios: torch.FloatTensor,
         initial_action: Optional[torch.FloatTensor] = None,
+        trace: Optional[dict] = None,
     ) -> torch.FloatTensor:
         dtype, device = pixel_values.dtype, pixel_values.device
         bsz = pixel_values.size(0)
@@ -431,12 +432,19 @@ class PiZero(nn.Module, NoSyncBase):
         kv_caches = self.joint_model.build_mixture_caches()
 
         # merge the text tokens and the image tokens
+        # TODO: check this
         inputs_embeds = self._forward_siglip_and_text_embedding(input_ids, pixel_values)
+        if trace is not None:
+            trace["inputs_embeds"] = inputs_embeds.detach().clone()
 
         # proprio
+        # TODO: check this
         proprio_embeds = self.proprio_encoder(proprios)
+        if trace is not None:
+            trace["proprio_embeds"] = proprio_embeds.detach().clone()
 
         # forward pass thru the vlm and proprio, cache the kv
+        # TODO: check this
         _, kv_caches = self.joint_model(
             attention_mask=image_text_proprio_mask,
             position_ids_all={
@@ -450,6 +458,16 @@ class PiZero(nn.Module, NoSyncBase):
             kv_caches=kv_caches,
             return_caches=True,
         )
+        if trace is not None:
+            trace["prefill_kv_caches"] = {
+                name: {
+                    "keys": [tensor.detach().clone() for tensor in cache.key_cache],
+                    "values": [
+                        tensor.detach().clone() for tensor in cache.value_cache
+                    ],
+                }
+                for name, cache in kv_caches.items()
+            }
 
         # sample pure action noise
         if initial_action is None:
@@ -466,19 +484,28 @@ class PiZero(nn.Module, NoSyncBase):
                     f"got {tuple(initial_action.shape)}"
                 )
             action = initial_action.to(device=device, dtype=dtype).clone()
+        if trace is not None:
+            trace["initial_action"] = action.detach().clone()
 
         # forward euler integration --- using kv caches of vlm and proprio
         delta_t = 1.0 / self.num_inference_steps
         t = torch.zeros(bsz, device=device, dtype=dtype)
-        for _ in range(self.num_inference_steps):
+        for step in range(self.num_inference_steps):
             # encode action and time into embedding
             time_cond = self.time_embedding(t)
+            if trace is not None:
+                trace[f"step_{step}.time_cond"] = time_cond.detach().clone()
             # [Batch_Size, Horizon_Steps, Embed_Dim]
             if self.action_expert_adaptive_mode:
+                # TODO: check this
                 action_embeds = self.action_encoder(action)
             else:
+                # TODO: check this
                 action_embeds = self.action_encoder(action, time_cond)
+            if trace is not None:
+                trace[f"step_{step}.action_encoder"] = action_embeds.detach().clone()
             # [Batch_Size, Horizon_Steps, Embed_Dim]
+            # TODO: check this
             action_embeds = self.joint_model(
                 attention_mask=action_mask,
                 position_ids_all={"action": action_position_ids},
@@ -487,9 +514,16 @@ class PiZero(nn.Module, NoSyncBase):
                 kv_caches=kv_caches,
                 cache_mode="append_non_active",  # use caches from other mixtures, i.e., vlm and proprio
             )["action"]
+            if trace is not None:
+                trace[f"step_{step}.action_joint_model"] = action_embeds.detach().clone()
             # decode action: [Batch_Size, Horizon_Steps, Action_Dim]
+            # TODO: check this
             action_vel = self.action_decoder(action_embeds)
+            if trace is not None:
+                trace[f"step_{step}.action_decoder"] = action_vel.detach().clone()
             action += delta_t * action_vel
+            if trace is not None:
+                trace[f"step_{step}.updated_action"] = action.detach().clone()
             t += delta_t
 
         # clamp final output if specified
@@ -499,6 +533,8 @@ class PiZero(nn.Module, NoSyncBase):
                 -self.final_action_clip_value,
                 self.final_action_clip_value,
             )
+        if trace is not None:
+            trace["final_action"] = action.detach().clone()
         return action
 
     def infer_action_naive(
@@ -685,6 +721,7 @@ class PiZeroInference(PiZero):
         action_position_ids: torch.LongTensor,
         proprios: torch.FloatTensor,
         initial_action: Optional[torch.FloatTensor] = None,
+        trace: Optional[dict] = None,
     ) -> torch.FloatTensor:
         return super().infer_action(
             input_ids,
@@ -696,6 +733,7 @@ class PiZeroInference(PiZero):
             action_position_ids,
             proprios,
             initial_action,
+            trace,
         )
 
 

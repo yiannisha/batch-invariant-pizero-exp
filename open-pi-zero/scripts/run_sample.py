@@ -27,6 +27,15 @@ from src.model.vla.pizero import PiZeroInference
 SEED = 42
 
 
+class BatchVarianceDetector:
+    """Compares a reference output with the same sample in a batch of distractors.
+    """
+
+    def __init__(self, model: PiZeroInference, reference_inputs: dict, reference_output: torch.Tensor):
+        self.model = model
+        self.reference_inputs = reference_inputs
+        self.reference_output = reference_output
+
 def synchronize(device: torch.device) -> None:
     if device.type == "cuda":
         torch.cuda.synchronize(device)
@@ -101,14 +110,98 @@ def concat_batches(first: dict, second: dict) -> dict:
     }
 
 
-def run_model(model, inputs: dict, device: torch.device) -> tuple[torch.Tensor, float]:
+def run_model(
+    model,
+    inputs: dict,
+    device: torch.device,
+    collect_trace: bool = False,
+) -> tuple[torch.Tensor, float, dict | None]:
     inputs = {key: value.to(device) for key, value in inputs.items()}
+    trace = {} if collect_trace else None
     synchronize(device)
     start = time.perf_counter()
     with torch.inference_mode():
-        output = model(**inputs)
+        output = model(**inputs, trace=trace)
     synchronize(device)
-    return output.float().cpu(), time.perf_counter() - start
+    return (
+        output.float().cpu(),
+        time.perf_counter() - start,
+        trace_to_cpu(trace) if trace is not None else None,
+    )
+
+
+def trace_to_cpu(value):
+    if isinstance(value, torch.Tensor):
+        return value.float().cpu()
+    if isinstance(value, dict):
+        return {key: trace_to_cpu(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [trace_to_cpu(item) for item in value]
+    return value
+
+
+def iter_trace_tensors(value, prefix=""):
+    if isinstance(value, torch.Tensor):
+        yield prefix, value
+    elif isinstance(value, dict):
+        for key, item in value.items():
+            child_prefix = f"{prefix}.{key}" if prefix else key
+            yield from iter_trace_tensors(item, child_prefix)
+    elif isinstance(value, list):
+        for index, item in enumerate(value):
+            yield from iter_trace_tensors(item, f"{prefix}[{index}]")
+
+
+def trace_metrics(reference_trace: dict, batch_trace: dict) -> dict:
+    """Compare index zero of every traced intermediate tensor."""
+    result = {}
+    reference_tensors = dict(iter_trace_tensors(reference_trace))
+    batch_tensors = dict(iter_trace_tensors(batch_trace))
+    for name, reference_tensor in reference_tensors.items():
+        batch_tensor = batch_tensors.get(name)
+        if batch_tensor is None:
+            result[name] = {"error": "missing from batch trace"}
+            continue
+        if reference_tensor.shape[1:] != batch_tensor.shape[1:]:
+            result[name] = {
+                "error": (
+                    f"shape mismatch: reference={tuple(reference_tensor.shape)}, "
+                    f"batch={tuple(batch_tensor.shape)}"
+                )
+            }
+            continue
+        result[name] = metrics(reference_tensor, batch_tensor[:1])
+    return result
+
+
+def aggregate_trace_metrics(trial_metrics: list[dict]) -> tuple[dict, dict]:
+    names = sorted({name for trial in trial_metrics for name in trial})
+    mean_metrics = {}
+    worst_metrics = {}
+    metric_names = (
+        "max_abs_diff",
+        "mean_abs_diff",
+        "rmse",
+        "relative_l2_mean",
+        "relative_l2_max",
+        "cosine_similarity_mean",
+        "output_abs_max",
+    )
+    for name in names:
+        entries = [trial[name] for trial in trial_metrics if name in trial]
+        if any("error" in entry for entry in entries):
+            mean_metrics[name] = entries[0]
+            worst_metrics[name] = entries[0]
+            continue
+        mean_metrics[name] = {
+            metric_name: float(np.mean([entry[metric_name] for entry in entries]))
+            for metric_name in metric_names
+        }
+        worst_metrics[name] = {
+            metric_name: float(max(entry[metric_name] for entry in entries))
+            for metric_name in metric_names
+        }
+    return mean_metrics, worst_metrics
 
 
 def metrics(reference: torch.Tensor, output: torch.Tensor) -> dict:
@@ -165,13 +258,14 @@ def main(args: argparse.Namespace) -> None:
     # Keep this sample fixed for every batch size and trial.
     reference_raw_inputs = make_inputs(config, 1, dtype)
     reference_inputs = add_masks(model, reference_raw_inputs, dtype)
-    reference_output, reference_elapsed = run_model(
-        model, reference_inputs, device
+    reference_output, reference_elapsed, reference_trace = run_model(
+        model, reference_inputs, device, collect_trace=True
     )
 
     results = []
     for batch_size in batch_sizes:
         trial_metrics = []
+        trial_trace_metrics = []
         trial_times = []
         for _ in range(args.num_trials):
             distractors = make_inputs(config, batch_size - 1, dtype)
@@ -180,11 +274,19 @@ def main(args: argparse.Namespace) -> None:
                 concat_batches(reference_raw_inputs, distractors),
                 dtype,
             )
-            output, elapsed = run_model(model, trial_inputs, device)
+            output, elapsed, batch_trace = run_model(
+                model, trial_inputs, device, collect_trace=True
+            )
             trial_metrics.append(metrics(reference_output, output[:1]))
+            trial_trace_metrics.append(
+                trace_metrics(reference_trace, batch_trace)
+            )
             trial_times.append(elapsed)
 
         metric_names = trial_metrics[0].keys()
+        stage_metrics_mean, stage_metrics_worst = aggregate_trace_metrics(
+            trial_trace_metrics
+        )
         result = {
             "batch_size": batch_size,
             "reference_samples": 1,
@@ -204,6 +306,8 @@ def main(args: argparse.Namespace) -> None:
                 name: float(max(trial[name] for trial in trial_metrics))
                 for name in metric_names
             },
+            "stage_metrics_mean": stage_metrics_mean,
+            "stage_metrics_worst": stage_metrics_worst,
         }
         results.append(result)
         print(json.dumps(result, sort_keys=False))
