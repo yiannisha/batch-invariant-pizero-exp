@@ -7,7 +7,7 @@ KV caches --- There are a few different modes depending on the setting:
     - text generation, only vlm active, use vlm cache --- append active (mode="append")
     - action naive inference, all active, use vlm and proprio cache --- no new tokens for the active mixture (mode="no_append")
     - action inference, no cache during vlm and proprio forward, then use vlm and proprio cache --- append, non-active (mode="append_non_active")
-    - action flow matching training, all active, no cache (mode does not matter)
+    - action inference, all active, using the VLM/proprio KV cache
 """
 
 import math
@@ -17,9 +17,10 @@ import torch
 import torch.nn as nn
 from omegaconf import OmegaConf
 
+from src.utils.trace import GLOBAL_TRACE
+
 from src.model.kv_cache import KVCache
 from src.model.vla.mixture import Mixture
-
 
 def forward_mixture_layers(
     mixtures: nn.ModuleDict,
@@ -47,6 +48,7 @@ def forward_mixture_layers(
             time_cond,
         )  # a bit convoluted
     hidden_states_pre_attn = hidden_states_input_norm
+    GLOBAL_TRACE.record(f"step_0.action_joint_model.layer_{layer_idx}.pre_attn", hidden_states_pre_attn)
 
     # [Batch_Size, Seq_Len, Hidden_Size]
     hidden_states_post_attn = forward_mixture_attn(
@@ -59,6 +61,7 @@ def forward_mixture_layers(
         kv_caches=kv_caches,
         cache_mode=cache_mode,
     )
+    GLOBAL_TRACE.record(f"step_0.action_joint_model.layer_{layer_idx}.post_attn", hidden_states_post_attn)
     hidden_states_pre_res = hidden_states_post_attn
 
     # [Batch_Size, Seq_Len, Hidden_Size]
@@ -78,6 +81,7 @@ def forward_mixture_layers(
                 residuals_pre_attn[name] + hidden_states_pre_res[name]
             )
     hidden_states_pre_post_attn = hidden_states_post_res
+    GLOBAL_TRACE.record(f"step_0.action_joint_model.layer_{layer_idx}.pre_post_attn", hidden_states_pre_post_attn)
 
     # [Batch_Size, Seq_Len, Hidden_Size]
     residuals_pre_post_attn = hidden_states_pre_post_attn
@@ -94,6 +98,7 @@ def forward_mixture_layers(
                 time_cond,
             )
     hidden_states_pre_mlp = hidden_states_post_post_attn
+    GLOBAL_TRACE.record(f"step_0.action_joint_model.layer_{layer_idx}.pre_mlp", hidden_states_pre_mlp)
 
     # [Batch_Size, Seq_Len, Hidden_Size]
     hidden_states_pos_mlp = {}
@@ -107,6 +112,7 @@ def forward_mixture_layers(
                 hidden_states_pre_mlp[name],
             )
     hidden_states_pre_final_res = hidden_states_pos_mlp
+    GLOBAL_TRACE.record(f"step_0.action_joint_model.layer_{layer_idx}.pre_final", hidden_states_pre_final_res)
 
     # [Batch_Size, Seq_Len, Hidden_Size]
     hidden_states_final = {}
@@ -124,8 +130,18 @@ def forward_mixture_layers(
             hidden_states_final[name] = (
                 residuals_pre_post_attn[name] + hidden_states_pre_final_res[name]
             )
+    GLOBAL_TRACE.record(f"step_0.action_joint_model.layer_{layer_idx}.final", hidden_states_final)
+
     return hidden_states_final
 
+def loop_bmm(a, b):
+    return torch.stack(
+        [
+            torch.stack(
+                [torch.mm(a[i][j], b[i][j]) for j in range(a.shape[1])]
+            ) for i in range(a.shape[0])
+        ]
+    )
 
 def forward_mixture_attn(
     mixtures: nn.ModuleDict,
@@ -157,6 +173,7 @@ def forward_mixture_attn(
             "forward_q_proj", layer_idx, hidden_states_all[name]
         )
         query_states_all[name] = query_states
+    GLOBAL_TRACE.record(f"step_0.action_joint_model.layer_{layer_idx}.pre_attn.query_states", query_states_all)
 
     # use kv caches from non-active mixtures
     key_states_all = {}
@@ -165,6 +182,7 @@ def forward_mixture_attn(
         for name, kv_cache in kv_caches.items():
             if name not in active_mixture_names:
                 key_states_all[name], value_states_all[name] = kv_cache.get(layer_idx)
+    GLOBAL_TRACE.record(f"step_0.action_joint_model.layer_{layer_idx}.pre_attn.kv_caches", value_states_all)
 
     # the caching logic below can be much simplified if we ignore the "no_append" mode, which is only used in the naive action inference mode
     for name in active_mixture_names:
@@ -173,6 +191,7 @@ def forward_mixture_attn(
         rope_cos, rope_sin = mixtures[name].attn_func(
             "forward_rotary_emb", layer_idx, query_states, position_ids_all[name]
         )
+        GLOBAL_TRACE.record(f"step_0.action_joint_model.layer_{layer_idx}.pre_attn.rope", rope_sin)
 
         # always use kv cache if it has the current layer
         flag_cached_mixture = name in kv_caches and kv_caches[name].has_item(layer_idx)
@@ -217,12 +236,14 @@ def forward_mixture_attn(
                     value_states_new,
                     layer_idx,
                 )
+            GLOBAL_TRACE.record(f"step_0.action_joint_model.layer_{layer_idx}.pre_attn.new_kv.{name}", key_states_new)
 
         # always apply rope to Q
         # [Batch_Size, Num_Heads_Q, Seq_Len, Head_Dim]
         query_states = mixtures[name].attn_func(
             "forward_apply_rotary_emb", layer_idx, query_states, rope_cos, rope_sin
         )
+        GLOBAL_TRACE.record(f"step_0.action_joint_model.layer_{layer_idx}.pre_attn.query_states_rope.mixture_{name}", query_states)
         query_states_all[name] = query_states
 
         # assign K and V carefully for this active mixture
@@ -249,12 +270,14 @@ def forward_mixture_attn(
         )
         key_states_all[name] = key_states
         value_states_all[name] = value_states
+    GLOBAL_TRACE.record(f"step_0.action_joint_model.layer_{layer_idx}.pre_attn.concatenated_kv", value_states_all)
 
     # Concatenate all the blocks along sequence
     # [Batch_Size, Num_Heads_Q / Num_Heads_KV, Full_Seq_Len, Head_Dim]
     query_states = torch.cat(tuple(query_states_all.values()), dim=-2)
     key_states = torch.cat(tuple(key_states_all.values()), dim=-2)
     value_states = torch.cat(tuple(value_states_all.values()), dim=2)
+    GLOBAL_TRACE.record(f"step_0.action_joint_model.layer_{layer_idx}.pre_attn.concatenated_qkv", value_states)
 
     # Perform the calculation as usual, Q * K^T / sqrt(head_dim)
     # [Batch_Size, Num_Heads_Q, Full_Seq_Len, Full_Seq_Len]
@@ -266,6 +289,7 @@ def forward_mixture_attn(
     attn_weights = attn_weights / attn_softclamp
     attn_weights = torch.tanh(attn_weights)
     attn_weights = attn_weights * attn_softclamp
+    GLOBAL_TRACE.record(f"step_0.action_joint_model.layer_{layer_idx}.pre_attn.attn_weights", attn_weights)
 
     # Apply the softmax / dropout
     attn_weights = attn_weights + attention_mask
@@ -273,13 +297,21 @@ def forward_mixture_attn(
     attn_weights = nn.functional.softmax(attn_weights, dim=-1, dtype=torch.float32).to(
         query_states.dtype
     )
+    GLOBAL_TRACE.record(f"step_0.action_joint_model.layer_{layer_idx}.pre_attn.attn_weights_softmax", attn_weights)
     attn_weights = nn.functional.dropout(
         attn_weights,
         p=attention_dropout,
         training=mixtures[active_mixture_names[0]].training,
     )
+
+    GLOBAL_TRACE.record(f"step_0.action_joint_model.layer_{layer_idx}.pre_attn.attn_weights_dropout", attn_weights)
+
     # Multiply by the values. [Batch_Size, Num_Heads_Q, Full_Seq_Len, Full_Seq_Len] x [Batch_Size, Num_Heads_KV, Full_Seq_Len, Head_Dim] -> [Batch_Size, Num_Heads_Q, Full_Seq_Len, Head_Dim]
-    attn_output = torch.matmul(attn_weights, value_states)
+    # attn_output = torch.matmul(attn_weights, value_states)
+    print("attn_weights shape:", attn_weights.shape)
+    print("value_states shape:", value_states.shape)
+    attn_output = loop_bmm(attn_weights, value_states)
+    GLOBAL_TRACE.record(f"step_0.action_joint_model.layer_{layer_idx}.pre_attn.attn_output_pre", attn_output)
 
     # Make sure the sequence length is the second dimension. # [Batch_Size, Num_Heads_Q, Full_Seq_Len, Head_Dim] -> [Batch_Size, Full_Seq_Len, Num_Heads_Q, Head_Dim]
     attn_output = attn_output.transpose(1, 2).contiguous()
@@ -292,6 +324,8 @@ def forward_mixture_attn(
         key: value for key, value in zip(active_mixture_names, attn_outputs)
     }
 
+    GLOBAL_TRACE.record(f"step_0.action_joint_model.layer_{layer_idx}.pre_attn.attn_outputs", attn_outputs)
+
     # Multiply by W_o. [Batch_Size, Seq_Len_Q, Hidden_Size]
     attn_outputs_final = {}
     for name in active_mixture_names:
@@ -301,6 +335,7 @@ def forward_mixture_attn(
             attn_outputs_final[name] = mixtures[name].attn_func(
                 "forward_o_proj", layer_idx, attn_outputs[name]
             )
+    GLOBAL_TRACE.record(f"step_0.action_joint_model.layer_{layer_idx}.post_attn.attn_outputs_final", attn_outputs_final)
     return attn_outputs_final
 
 
@@ -353,6 +388,7 @@ class JointModel(nn.Module):
                 device=embeds_all[name].device,
             )
             embeds_all[name] *= normalizer
+        GLOBAL_TRACE.record(f"step_0.action_joint_model.normalization", embeds_all)
 
         # layers
         for layer_idx in range(self.num_hidden_layers):
@@ -370,6 +406,7 @@ class JointModel(nn.Module):
                 if is_final_layer
                 else [],
             )
+        GLOBAL_TRACE.record(f"step_0.action_joint_model.forward", embeds_all)
 
         # [Batch_Size, Seq_Len, Hidden_Size]
         hidden_states_all = {}
@@ -378,6 +415,8 @@ class JointModel(nn.Module):
                 hidden_states_all[name] = self.mixtures[name].forward_norm(
                     embeds_all[name], time_cond
                 )
+        GLOBAL_TRACE.record(f"step_0.action_joint_model.forward_norm", hidden_states_all)
+
         if return_caches:
             return hidden_states_all, kv_caches
         return hidden_states_all
@@ -386,7 +425,7 @@ class JointModel(nn.Module):
 if __name__ == "__main__":
     from omegaconf import OmegaConf
 
-    cfg = OmegaConf.load("config/train/bridge.yaml")
+    cfg = OmegaConf.load("config/inference.yaml")
     model = JointModel(cfg.joint.config)
 
     # dummy inputs

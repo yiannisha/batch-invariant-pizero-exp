@@ -1,5 +1,6 @@
 """
-Wrapper around the joint model (mixtures). Siglip from PaliGemma, action-time encoder, proprio encoder, action decoder. Flow matching training
+Inference wrapper around the joint model (mixtures). SigLIP, action-time
+encoder, proprio encoder, action decoder, and flow-matching action sampling.
 
 Generates causal masking for the mixtures
 
@@ -21,6 +22,7 @@ from src.model.vla.modules import (
 )
 from src.utils.decorator import NoSyncBase
 from src.utils.monitor import log_execution_time
+from src.utils.trace import GLOBAL_TRACE
 
 log = logging.getLogger(__name__)
 
@@ -55,7 +57,6 @@ class PiZero(nn.Module, NoSyncBase):
         self.action_dim = cfg.action_dim
         self.proprio_dim = cfg.proprio_dim
         self.final_action_clip_value = cfg.final_action_clip_value
-        self.flow_sig_min = cfg.get("flow_sig_min", 0.001)
 
         # text input only
         self.embed_tokens = nn.Embedding(
@@ -110,52 +111,6 @@ class PiZero(nn.Module, NoSyncBase):
                 bias=False,
             )
             self.lm_head.weight = self.embed_tokens.weight  # tie weights
-
-    @property
-    def action_expert_parameters(self):
-        return (
-            list(self.action_encoder.parameters())
-            + list(self.action_decoder.parameters())
-            + list(self.proprio_encoder.parameters())
-            + list(self.joint_model.mixtures["action"].parameters())
-        )  # note: action and proprio share weights
-
-    @property
-    def trainable_vlm_parameters(self):
-        return (
-            list(self.vision_tower.parameters())
-            + list(self.multi_modal_projector.parameters())
-            + self.trainable_gemma_parameters
-        )
-
-    @property
-    def lora_trainable_vlm_parameters(self):
-        params = []
-        for name, param in self.vision_tower.named_parameters():
-            if "lora_" in name:
-                params.append(param)
-        for name, param in self.multi_modal_projector.named_parameters():
-            if "lora_" in name:
-                params.append(param)
-        params.extend(self.trainable_lora_gemma_parameters)
-        return params
-
-    @property
-    def trainable_gemma_parameters(self):
-        gemma_parameters = []
-        for name, param in self.joint_model.mixtures["vlm"].named_parameters():
-            if not self._check_gemma_unused_parameter_by_name(name):
-                gemma_parameters.append(param)
-        return gemma_parameters
-
-    @property
-    def trainable_lora_gemma_parameters(self):
-        gemma_parameters = []
-        for name, param in self.joint_model.mixtures["vlm"].named_parameters():
-            if not self._check_gemma_unused_parameter_by_name(name):
-                if "lora_" in name:
-                    gemma_parameters.append(param)
-        return gemma_parameters
 
     @log_execution_time(log)
     def load_pretrained_weights(self):
@@ -220,44 +175,6 @@ class PiZero(nn.Module, NoSyncBase):
                 joint_model_state_dict[new_key] = v
         self.joint_model.load_state_dict(joint_model_state_dict, strict=False)
         log.info("Loaded pre-trained weights for lm part of the joint model")
-
-    def _check_gemma_unused_parameter_by_name(self, name: str) -> bool:
-        """no need to train vlm parameters after attention of last layer"""
-        last_hidden_layer_index = self.joint_model.num_hidden_layers - 1
-        if (
-            f"{last_hidden_layer_index}.post" in name
-            or f"{last_hidden_layer_index}.mlp" in name
-            or f"{last_hidden_layer_index}.self_attn.o_proj" in name
-            or f"{last_hidden_layer_index}.self_attn.v_proj" in name
-        ):  # final norm is not initialized
-            return True
-        return False
-
-    def freeze_non_lora_weights_in_vlm(self):
-        """Keep all bias frozen"""
-        for name, param in self.vision_tower.named_parameters():
-            param.requires_grad = True if "lora_" in name else False
-        log.info("Froze non-lora weights in vision tower")
-
-        for name, param in self.multi_modal_projector.named_parameters():
-            param.requires_grad = True if "lora_" in name else False
-        log.info("Froze non-lora weights in projector")
-
-        for name, param in self.joint_model.mixtures["vlm"].named_parameters():
-            if not self._check_gemma_unused_parameter_by_name(name):
-                param.requires_grad = True if "lora_" in name else False
-        log.info("Froze non-lora weights in lm part of the joint model")
-
-    def freeze_unused_weights(self):
-        """text embedding and part of last layer of vlm, including lora"""
-        self.embed_tokens.weight.requires_grad = False
-        for name, param in self.joint_model.mixtures["vlm"].named_parameters():
-            if self._check_gemma_unused_parameter_by_name(name):
-                param.requires_grad = False
-
-    def freeze_all_weights(self):
-        for _, param in self.named_parameters():
-            param.requires_grad = False
 
     def tie_action_proprio_weights(self):
         """technically more than just tying weights"""
@@ -383,11 +300,14 @@ class PiZero(nn.Module, NoSyncBase):
         # text embedding
         # [Batch_Size, Seq_Len, Hidden_Size]
         inputs_embeds = self.embed_tokens(input_ids)
+        GLOBAL_TRACE.record("inputs_embeds.inputs_embeds", inputs_embeds)
 
         # image features from siglip and projector
         # [Batch_Size, Channels, Height, Width] -> [Batch_Size, Num_Patches, Embed_Dim] -> [Batch_Size, Num_Patches, Hidden_Size]
         selected_image_feature = self.vision_tower(pixel_values)
+        GLOBAL_TRACE.record("inputs_embeds.selected_image_feature", selected_image_feature)
         image_features = self.multi_modal_projector(selected_image_feature)
+        GLOBAL_TRACE.record("inputs_embeds.image_features", image_features)
 
         # normalize the image features
         _, _, embed_dim = image_features.shape
@@ -424,7 +344,6 @@ class PiZero(nn.Module, NoSyncBase):
         action_position_ids: torch.LongTensor,
         proprios: torch.FloatTensor,
         initial_action: Optional[torch.FloatTensor] = None,
-        trace: Optional[dict] = None,
     ) -> torch.FloatTensor:
         dtype, device = pixel_values.dtype, pixel_values.device
         bsz = pixel_values.size(0)
@@ -434,17 +353,15 @@ class PiZero(nn.Module, NoSyncBase):
         # merge the text tokens and the image tokens
         # TODO: check this
         inputs_embeds = self._forward_siglip_and_text_embedding(input_ids, pixel_values)
-        if trace is not None:
-            trace["inputs_embeds"] = inputs_embeds.detach().clone()
+        GLOBAL_TRACE.record("inputs_embeds", inputs_embeds)
 
         # proprio
         # TODO: check this
         proprio_embeds = self.proprio_encoder(proprios)
-        if trace is not None:
-            trace["proprio_embeds"] = proprio_embeds.detach().clone()
+        GLOBAL_TRACE.record("proprio_embeds", proprio_embeds)
 
         # forward pass thru the vlm and proprio, cache the kv
-        # TODO: check this
+        # TODO: check this -> uses RMSNorm which is not batch invariant, and there are no OSS thinky operators for it
         _, kv_caches = self.joint_model(
             attention_mask=image_text_proprio_mask,
             position_ids_all={
@@ -458,16 +375,16 @@ class PiZero(nn.Module, NoSyncBase):
             kv_caches=kv_caches,
             return_caches=True,
         )
-        if trace is not None:
-            trace["prefill_kv_caches"] = {
+        GLOBAL_TRACE.record(
+            "prefill_kv_caches",
+            {
                 name: {
-                    "keys": [tensor.detach().clone() for tensor in cache.key_cache],
-                    "values": [
-                        tensor.detach().clone() for tensor in cache.value_cache
-                    ],
+                    "keys": cache.key_cache,
+                    "values": cache.value_cache,
                 }
                 for name, cache in kv_caches.items()
-            }
+            },
+        )
 
         # sample pure action noise
         if initial_action is None:
@@ -484,8 +401,7 @@ class PiZero(nn.Module, NoSyncBase):
                     f"got {tuple(initial_action.shape)}"
                 )
             action = initial_action.to(device=device, dtype=dtype).clone()
-        if trace is not None:
-            trace["initial_action"] = action.detach().clone()
+        GLOBAL_TRACE.record("initial_action", action)
 
         # forward euler integration --- using kv caches of vlm and proprio
         delta_t = 1.0 / self.num_inference_steps
@@ -493,8 +409,7 @@ class PiZero(nn.Module, NoSyncBase):
         for step in range(self.num_inference_steps):
             # encode action and time into embedding
             time_cond = self.time_embedding(t)
-            if trace is not None:
-                trace[f"step_{step}.time_cond"] = time_cond.detach().clone()
+            GLOBAL_TRACE.record(f"step_{step}.time_cond", time_cond)
             # [Batch_Size, Horizon_Steps, Embed_Dim]
             if self.action_expert_adaptive_mode:
                 # TODO: check this
@@ -502,8 +417,7 @@ class PiZero(nn.Module, NoSyncBase):
             else:
                 # TODO: check this
                 action_embeds = self.action_encoder(action, time_cond)
-            if trace is not None:
-                trace[f"step_{step}.action_encoder"] = action_embeds.detach().clone()
+            GLOBAL_TRACE.record(f"step_{step}.action_encoder", action_embeds)
             # [Batch_Size, Horizon_Steps, Embed_Dim]
             # TODO: check this
             action_embeds = self.joint_model(
@@ -514,16 +428,13 @@ class PiZero(nn.Module, NoSyncBase):
                 kv_caches=kv_caches,
                 cache_mode="append_non_active",  # use caches from other mixtures, i.e., vlm and proprio
             )["action"]
-            if trace is not None:
-                trace[f"step_{step}.action_joint_model"] = action_embeds.detach().clone()
+            GLOBAL_TRACE.record(f"step_{step}.action_joint_model", action_embeds)
             # decode action: [Batch_Size, Horizon_Steps, Action_Dim]
             # TODO: check this
             action_vel = self.action_decoder(action_embeds)
-            if trace is not None:
-                trace[f"step_{step}.action_decoder"] = action_vel.detach().clone()
+            GLOBAL_TRACE.record(f"step_{step}.action_decoder", action_vel)
             action += delta_t * action_vel
-            if trace is not None:
-                trace[f"step_{step}.updated_action"] = action.detach().clone()
+            GLOBAL_TRACE.record(f"step_{step}.updated_action", action)
             t += delta_t
 
         # clamp final output if specified
@@ -533,8 +444,7 @@ class PiZero(nn.Module, NoSyncBase):
                 -self.final_action_clip_value,
                 self.final_action_clip_value,
             )
-        if trace is not None:
-            trace["final_action"] = action.detach().clone()
+        GLOBAL_TRACE.record("final_action", action)
         return action
 
     def infer_action_naive(
@@ -640,75 +550,6 @@ class PiZero(nn.Module, NoSyncBase):
             output["kv_cache"] = kv_cache
         return output
 
-    # ---------- Flow matching training ----------#
-
-    def psi_t(
-        self,
-        x: torch.FloatTensor,
-        x1: torch.FloatTensor,
-        t: torch.FloatTensor,
-    ) -> torch.FloatTensor:
-        """Conditional Flow"""
-        t = t[:, None, None]  # (B, 1, 1)
-        return (1 - (1 - self.flow_sig_min) * t) * x + t * x1
-
-    def forward(
-        self,
-        input_ids: torch.LongTensor,
-        pixel_values: torch.ByteTensor,
-        causal_mask: torch.FloatTensor,
-        vlm_position_ids: torch.LongTensor,
-        proprio_position_ids: torch.LongTensor,
-        action_position_ids: torch.LongTensor,
-        proprios: torch.FloatTensor,
-        actions: torch.FloatTensor,
-        t: torch.FloatTensor,
-    ) -> torch.FloatTensor:
-        """flow matching loss for action prediction, no use of kv cache"""
-        # noisy action
-        # [Batch_Size, Horizon_Steps, Action_Dim]
-        x0 = torch.randn_like(actions, device=t.device, dtype=t.dtype)
-        x1 = actions
-        psi_t = self.psi_t(x0, x1, t)
-
-        # text tokens + image tokens
-        inputs_embeds = self._forward_siglip_and_text_embedding(input_ids, pixel_values)
-
-        # proprio
-        proprio_embeds = self.proprio_encoder(proprios)
-
-        # inference with noisy action
-        # [Batch_Size, Embed_Dim]
-        time_cond = self.time_embedding(t)
-        # [Batch_Size, Horizon_Steps, Embed_Dim]
-        if self.action_expert_adaptive_mode:
-            action_embeds = self.action_encoder(psi_t)
-        else:
-            action_embeds = self.action_encoder(psi_t, time_cond)
-        action_embeds = self.joint_model(
-            attention_mask=causal_mask,
-            position_ids_all={
-                "vlm": vlm_position_ids,
-                "proprio": proprio_position_ids,
-                "action": action_position_ids,
-            },
-            embeds_all={
-                "vlm": inputs_embeds,
-                "proprio": proprio_embeds,
-                "action": action_embeds,
-            },
-            time_cond=time_cond,
-            kv_caches={},  # no caching during training
-        )["action"]
-
-        # [Batch_Size, Horizon_Steps, Action_Dim]
-        v_psi = self.action_decoder(action_embeds)
-
-        # compare to true velocity
-        d_psi = x1 - (1 - self.flow_sig_min) * x0
-        return torch.mean((v_psi - d_psi) ** 2)
-
-
 class PiZeroInference(PiZero):
     def forward(
         self,
@@ -721,7 +562,6 @@ class PiZeroInference(PiZero):
         action_position_ids: torch.LongTensor,
         proprios: torch.FloatTensor,
         initial_action: Optional[torch.FloatTensor] = None,
-        trace: Optional[dict] = None,
     ) -> torch.FloatTensor:
         return super().infer_action(
             input_ids,
@@ -733,7 +573,6 @@ class PiZeroInference(PiZero):
             action_position_ids,
             proprios,
             initial_action,
-            trace,
         )
 
 
@@ -741,9 +580,7 @@ if __name__ == "__main__":
     import argparse
     import time
 
-    import numpy as np
     from omegaconf import OmegaConf
-    from PIL import Image
     from transformers import AutoTokenizer
 
     from src.model.vla.processing import VLAProcessor
@@ -752,15 +589,12 @@ if __name__ == "__main__":
     parser.add_argument("--text_only", action="store_true")
     parser.add_argument("--load_pretrained_weights", action="store_true")
     parser.add_argument("--cpu", action="store_true")
-    parser.add_argument("--loss_only", action="store_true")
     parser.add_argument("--use_bf16", action="store_true")
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
-    assert not (args.text_only and args.loss_only)
-
     torch.manual_seed(args.seed)
 
-    config = OmegaConf.load("config/train/bridge.yaml")
+    config = OmegaConf.load("config/inference.yaml")
     if args.text_only:
         config.use_lm_head = True
         config.mixture.vlm.use_final_norm = True
@@ -780,12 +614,7 @@ if __name__ == "__main__":
     dummy_images = torch.randint(
         0, 256, (bsz, 3, 224, 224), dtype=torch.uint8
     )  # not used if text_only
-    real_image_path = "media/maniskill_pp.png"
-    real_image = Image.open(real_image_path).convert("RGB")
-    real_image_t = torch.as_tensor(
-        np.array(real_image.resize((224, 224))).transpose(2, 0, 1)
-    )
-    dummy_images[0] = real_image_t
+    dummy_images[0] = torch.randint(0, 256, (3, 224, 224), dtype=torch.uint8)
 
     # text and proprio
     dummy_texts = [
@@ -843,32 +672,8 @@ if __name__ == "__main__":
         generated_tokens = torch.cat(generated_tokens, dim=-1)
         decoded = processor.tokenizer.decode(generated_tokens, skip_special_tokens=True)
         print("\n\n=========================")
-        print("Image path:", real_image_path)
         print("Prompt:", dummy_texts[0])
         print("Generated text:", decoded)
-    elif args.loss_only:
-        dummy_actions = torch.randn(bsz, config.horizon_steps, config.action_dim)
-        causal_mask, vlm_position_ids, proprio_position_ids, action_position_ids = (
-            model.build_causal_mask_and_position_ids(attention_mask, dtype=dtype)
-        )
-        image_text_proprio_mask, action_mask = model.split_full_mask_into_submasks(
-            causal_mask
-        )
-        t = torch.rand(bsz)
-        with torch.inference_mode():
-            loss = model(
-                input_ids=input_ids.to(device),
-                pixel_values=pixel_values.to(dtype).to(device),
-                causal_mask=causal_mask.to(device),
-                vlm_position_ids=vlm_position_ids.to(device),
-                proprio_position_ids=proprio_position_ids.to(device),
-                action_position_ids=action_position_ids.to(device),
-                proprios=dummy_proprio.to(dtype).to(device),
-                actions=dummy_actions.to(dtype).to(device),
-                t=t.to(dtype).to(device),
-            )
-        print("\n\n=========================")
-        print("Loss:", loss)
     else:  # dummy action generation
         causal_mask, vlm_position_ids, proprio_position_ids, action_position_ids = (
             model.build_causal_mask_and_position_ids(attention_mask, dtype=dtype)

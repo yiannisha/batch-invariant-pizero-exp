@@ -22,19 +22,11 @@ import torch
 from omegaconf import OmegaConf
 
 from src.model.vla.pizero import PiZeroInference
+from src.utils.trace import trace_context
 
 
 SEED = 42
 
-
-class BatchVarianceDetector:
-    """Compares a reference output with the same sample in a batch of distractors.
-    """
-
-    def __init__(self, model: PiZeroInference, reference_inputs: dict, reference_output: torch.Tensor):
-        self.model = model
-        self.reference_inputs = reference_inputs
-        self.reference_output = reference_output
 
 def synchronize(device: torch.device) -> None:
     if device.type == "cuda":
@@ -116,13 +108,20 @@ def run_model(
     device: torch.device,
     collect_trace: bool = False,
 ) -> tuple[torch.Tensor, float, dict | None]:
-    inputs = {key: value.to(device) for key, value in inputs.items()}
-    trace = {} if collect_trace else None
-    synchronize(device)
-    start = time.perf_counter()
-    with torch.inference_mode():
-        output = model(**inputs, trace=trace)
-    synchronize(device)
+    from batch_invariant_ops import set_batch_invariant_mode
+
+    with set_batch_invariant_mode(True):
+        inputs = {key: value.to(device) for key, value in inputs.items()}
+        trace = {} if collect_trace else None
+        synchronize(device)
+        start = time.perf_counter()
+        with torch.inference_mode():
+            if trace is None:
+                output = model(**inputs)
+            else:
+                with trace_context(trace):
+                    output = model(**inputs)
+        synchronize(device)
     return (
         output.float().cpu(),
         time.perf_counter() - start,
@@ -184,7 +183,6 @@ def aggregate_trace_metrics(trial_metrics: list[dict]) -> tuple[dict, dict]:
         "rmse",
         "relative_l2_mean",
         "relative_l2_max",
-        "cosine_similarity_mean",
         "output_abs_max",
     )
     for name in names:
@@ -207,13 +205,9 @@ def aggregate_trace_metrics(trial_metrics: list[dict]) -> tuple[dict, dict]:
 def metrics(reference: torch.Tensor, output: torch.Tensor) -> dict:
     difference = output - reference
     reference_flat = reference.reshape(reference.shape[0], -1)
-    output_flat = output.reshape(output.shape[0], -1)
     difference_flat = difference.reshape(difference.shape[0], -1)
     reference_norm = torch.linalg.vector_norm(reference_flat, dim=1)
     difference_norm = torch.linalg.vector_norm(difference_flat, dim=1)
-    cosine = torch.nn.functional.cosine_similarity(
-        reference_flat, output_flat, dim=1, eps=1e-12
-    )
     relative_l2 = difference_norm / reference_norm.clamp_min(1e-12)
     return {
         "max_abs_diff": difference.abs().max().item(),
@@ -221,7 +215,6 @@ def metrics(reference: torch.Tensor, output: torch.Tensor) -> dict:
         "rmse": torch.sqrt(torch.mean(difference.square())).item(),
         "relative_l2_mean": relative_l2.mean().item(),
         "relative_l2_max": relative_l2.max().item(),
-        "cosine_similarity_mean": cosine.mean().item(),
         "output_abs_max": output.abs().max().item(),
     }
 
@@ -310,7 +303,7 @@ def main(args: argparse.Namespace) -> None:
             "stage_metrics_worst": stage_metrics_worst,
         }
         results.append(result)
-        print(json.dumps(result, sort_keys=False))
+        # print(json.dumps(result, sort_keys=False))
 
     output_path = Path(args.output)
     output_path.write_text(json.dumps(results, indent=2) + "\n")
@@ -320,7 +313,7 @@ def main(args: argparse.Namespace) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--config", default="config/eval/bridge.yaml", help="PiZero config YAML"
+        "--config", default="config/inference.yaml", help="PiZero config YAML"
     )
     parser.add_argument(
         "--batch_sizes",

@@ -11,24 +11,19 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 dependencies = [
-    "bitsandbytes==0.45.0; sys_platform != 'darwin'",
     "einops",
-    "gsutil>=5.32",
     "hydra-core",
-    "imageio",
-    "matplotlib",
     "numpy==1.26.4",
     "omegaconf",
-    "pillow",
-    "pre-commit>=4.0.1",
-    "pretty_errors",
-    "protobuf==3.20.3",
-    "tensorflow==2.15.0",
-    "tensorflow_datasets==4.9.2",
+    "safetensors",
     "torch==2.5.0",
     "transformers==4.47.1",
-    "tqdm",
-    "wandb",
+    "batch-invariant-ops",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
 ]
 
 [build-system]
@@ -37,6 +32,9 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 exclude = []
+
+[tool.uv.sources]
+batch-invariant-ops = { path = "batch_invariant_ops" }
 
 [tool.ruff]
 line-length = 88

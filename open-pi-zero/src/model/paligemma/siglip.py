@@ -2,9 +2,10 @@ from typing import Optional, Tuple
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 from src.model.lora import get_layer
-
+from src.utils.trace import GLOBAL_TRACE
 
 class PaliGemmaMultiModalProjector(nn.Module):
     def __init__(
@@ -31,6 +32,54 @@ class PaliGemmaMultiModalProjector(nn.Module):
         return hidden_states
 
 
+def _pair(value):
+    return (value, value) if isinstance(value, int) else tuple(value)
+
+
+class _UnfoldConv2d(nn.Module):
+    """Conv2d with one independent reduction per input sample.
+
+    The standard CUDA convolution can choose a reduction schedule based on the
+    whole batch.  Running the patch projection sample-by-sample keeps the
+    reduction order fixed, which is the property needed by the experiment.
+    """
+
+    def __init__(self, c_in, c_out, kernel_size, stride, padding):
+        super().__init__()
+        kernel_size = _pair(kernel_size)
+        self.kernel_size = kernel_size
+        self.stride = _pair(stride)
+        self.padding = _pair(padding)
+        self.weight = nn.Parameter(
+            torch.empty(c_out, c_in, *kernel_size)
+        )
+        self.bias = nn.Parameter(torch.empty(c_out))
+        nn.init.kaiming_uniform_(self.weight, a=5**0.5)
+        bound = 1 / (c_in * kernel_size[0] * kernel_size[1]) ** 0.5
+        nn.init.uniform_(self.bias, -bound, bound)
+
+    def forward(self, x):
+        outputs = []
+        flattened_weight = self.weight.flatten(1)
+        for sample in x:
+            patches = F.unfold(
+                sample.unsqueeze(0),
+                kernel_size=self.kernel_size,
+                dilation=1,
+                padding=self.padding,
+                stride=self.stride,
+            )
+            output = flattened_weight @ patches + self.bias[:, None]
+            height = (
+                sample.shape[-2] + 2 * self.padding[0] - self.kernel_size[0]
+            ) // self.stride[0] + 1
+            width = (
+                sample.shape[-1] + 2 * self.padding[1] - self.kernel_size[1]
+            ) // self.stride[1] + 1
+            outputs.append(output.reshape(1, -1, height, width))
+        return torch.cat(outputs, dim=0)
+
+
 class SiglipVisionEmbeddings(nn.Module):
     def __init__(self, config):
         super().__init__()
@@ -39,12 +88,12 @@ class SiglipVisionEmbeddings(nn.Module):
         self.image_size = config.image_size
         self.patch_size = config.patch_size
 
-        self.patch_embedding = nn.Conv2d(
-            in_channels=config.num_channels,
-            out_channels=self.embed_dim,
+        self.patch_embedding = _UnfoldConv2d(
+            c_in=config.num_channels,
+            c_out=self.embed_dim,
             kernel_size=self.patch_size,
             stride=self.patch_size,
-            padding="valid",  # This indicates no padding is added
+            padding=0,  # This indicates no padding is added
         )
 
         self.num_patches = (self.image_size // self.patch_size) ** 2
@@ -57,6 +106,9 @@ class SiglipVisionEmbeddings(nn.Module):
         )
 
     def forward(self, pixel_values: torch.FloatTensor) -> torch.Tensor:
+        GLOBAL_TRACE.record(
+            "input_embeds.selected_image_feature.pixel_values", pixel_values
+        )
         (
             _,
             _,
@@ -67,6 +119,9 @@ class SiglipVisionEmbeddings(nn.Module):
         # The output of the convolution will have shape [Batch_Size, Embed_Dim, Num_Patches_H, Num_Patches_W]
         # where Num_Patches_H = height // patch_size and Num_Patches_W = width // patch_size
         patch_embeds = self.patch_embedding(pixel_values)
+        GLOBAL_TRACE.record(
+            "input_embeds.selected_image_feature.patch_embeds", patch_embeds
+        )
         # [Batch_Size, Embed_Dim, Num_Patches_H, Num_Patches_W] -> [Batch_Size, Embed_Dim, Num_Patches]
         # where Num_Patches = Num_Patches_H * Num_Patches_W
         embeddings = patch_embeds.flatten(2)
@@ -74,6 +129,9 @@ class SiglipVisionEmbeddings(nn.Module):
         embeddings = embeddings.transpose(1, 2)
         # Add position embeddings to each patch. Each positional encoding is a vector of size [Embed_Dim]
         embeddings = embeddings + self.position_embedding(self.position_ids)
+        GLOBAL_TRACE.record(
+            "input_embeds.selected_image_feature.embeddings", embeddings
+        )
         # [Batch_Size, Num_Patches, Embed_Dim]
         return embeddings
 
@@ -292,10 +350,20 @@ class SiglipVisionTransformer(nn.Module):
     def forward(self, pixel_values: torch.Tensor) -> torch.Tensor:
         # pixel_values: [Batch_Size, Channels, Height, Width] -> [Batch_Size, Num_Patches, Embed_Dim]
         hidden_states = self.embeddings(pixel_values)
+        GLOBAL_TRACE.record(
+            "input_embeds.selected_image_feature.hidden_states", hidden_states
+        )
 
         last_hidden_state = self.encoder(inputs_embeds=hidden_states)
+        GLOBAL_TRACE.record(
+            "input_embeds.selected_image_feature.last_hidden_state", last_hidden_state
+        )
 
         last_hidden_state = self.post_layernorm(last_hidden_state)
+        GLOBAL_TRACE.record(
+            "input_embeds.selected_image_feature.last_hidden_state.post_layernorm",
+            last_hidden_state,
+        )
 
         return last_hidden_state
 
