@@ -20,7 +20,9 @@ def main() -> None:
     )
     args = parser.parse_args()
     status = subprocess.check_output(
-        ["git", "status", "--porcelain"], cwd=PROJECT_ROOT.parent, text=True
+        ["git", "status", "--porcelain", "--untracked-files=no"],
+        cwd=PROJECT_ROOT.parent,
+        text=True,
     ).strip()
     if status and not args.allow_dirty:
         raise RuntimeError("commit the numerical implementation before freezing it")
