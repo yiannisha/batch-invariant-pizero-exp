@@ -65,9 +65,18 @@ def main() -> None:
     freeze = load_json(RESULTS / "numerical_freeze.json", {})
     heldout = load_jsonl(RESULTS / "heldout" / "invariance.jsonl")
     diagnostic = load_jsonl(RESULTS / "diagnostic" / "policy_ablation.jsonl")
-    policies = policy_summary(heldout or diagnostic)
+    diagnostic_large = load_jsonl(RESULTS / "diagnostic" / "policy_ablation_large_batches.jsonl")
+    diagnostic_bfloat16 = load_jsonl(RESULTS / "diagnostic" / "policy_ablation_bfloat16.jsonl")
+    diagnostic_primary = diagnostic + diagnostic_large
+    policies = policy_summary(heldout or diagnostic_primary)
+    bfloat16_policies = policy_summary(diagnostic_bfloat16)
+    transformations = load_jsonl(RESULTS / "diagnostic" / "batch_transformations.jsonl")
     scope = "held-out replay" if heldout else "synthetic diagnostic"
     trace = load_json(RESULTS / "diagnostic" / "first_divergence.json", {})
+    local_native = load_json(RESULTS / "diagnostic" / "local_operator_replay.json")
+    local_patch = load_json(RESULTS / "diagnostic" / "local_replay_patch_o_proj.json")
+    local_explicit = load_json(RESULTS / "diagnostic" / "local_replay_explicit_o_proj.json")
+    local_full = load_json(RESULTS / "diagnostic" / "local_replay_full_o_proj.json")
     fidelity = load_json(RESULTS / "diagnostic" / "singleton_fidelity.json")
     operator = load_jsonl(RESULTS / "operator" / "raw.jsonl")
     kernel = load_json(RESULTS / "performance" / "kernel_summary.json", [])
@@ -102,18 +111,18 @@ def main() -> None:
             f"The maximum normalized action error was {fmt(native['max_error'])}.",
         ]
         native_records = [
-            item for item in (heldout or diagnostic)
+            item for item in (heldout or diagnostic_primary)
             if item["implementation"] == "native" and item.get("batch_size") != 1
         ]
         errors = [metric(item)["max_absolute_error"] for item in native_records]
-        transformations = sorted({
+        tested_transformations = sorted({
             item.get("transformation", "batch_position") for item in native_records
         })
         batch_sizes = sorted({item["batch_size"] for item in native_records})
         positions = sorted({str(item["target_batch_position"]) for item in native_records})
         companions = sorted({item["companion_type"] for item in native_records})
         lines += [
-            f"Tested transformations={transformations}, batch sizes={batch_sizes}, target "
+            f"Tested transformations={tested_transformations}, batch sizes={batch_sizes}, target "
             f"positions={positions}, companions={companions}. Across arrangement-level maximum "
             f"errors: median={fmt(statistics.median(errors))}, p95={fmt(percentile(errors, 0.95))}, "
             f"p99={fmt(percentile(errors, 0.99))}."
@@ -125,6 +134,32 @@ def main() -> None:
             "The required 2,400-request held-out result is unavailable because the replay dataset "
             "could not be collected in this container; this diagnostic result must not be read as a held-out rate."
         ]
+    if transformations:
+        native_transformations = [
+            item for item in transformations if item["implementation"] == "native"
+        ]
+        lines += [
+            f"In the separate same-request-set transformation matrix, native failed "
+            f"{sum(not item['output']['exact'] for item in native_transformations)}/"
+            f"{len(native_transformations)} aggregate comparisons: all five partition changes "
+            f"failed, while all five restored permutations were exact."
+        ]
+
+    lines += ["", "### Separate BF16 policy campaign", ""]
+    if bfloat16_policies:
+        for implementation in (
+            "native", "native_deterministic", "existing_invariant_ops",
+            "invariant_plus_patch_projection", "explicit_per_matrix_attention",
+            "full_invariant",
+        ):
+            item = bfloat16_policies[implementation]
+            lines.append(
+                f"- `{implementation}`: {item['arrangement_violations']}/"
+                f"{item['arrangements']} arrangement violations; maximum error "
+                f"{fmt(item['max_error'])}."
+            )
+    else:
+        lines.append("Unavailable.")
 
     lines += ["", "## B. Where does native execution first diverge?", ""]
     if trace:
@@ -134,6 +169,19 @@ def main() -> None:
             lines.append(f"- `{implementation}`: {boundary}")
     else:
         lines.append("Unavailable: no invocation-aware trace report was produced.")
+    if local_native:
+        lines.append(
+            f"Native local replay at `{local_native['module']}` used bit-identical inputs and "
+            f"reproduced a max error of {fmt(local_native['local_replay_comparison']['max_absolute_error'])} "
+            f"through {', '.join(local_native['dispatched_aten_operations'])}."
+        )
+    if local_patch and local_explicit and local_full:
+        lines.append(
+            f"The VLM layer-0 output projection replay was locally batch-sensitive in both the "
+            f"patch-projection and explicit-attention modes (max "
+            f"{fmt(local_explicit['local_replay_comparison']['max_absolute_error'])}), but exact "
+            f"for the tested full-invariant input."
+        )
 
     lines += ["", "## C. How do differences propagate through the flow solver?", ""]
     if trace:
@@ -159,6 +207,16 @@ def main() -> None:
             f"In the {scope} records, {full['arrangement_violations']}/{full['arrangements']} "
             f"non-singleton arrangements failed exact equality; maximum error was {fmt(full['max_error'])}."
         )
+        if transformations:
+            full_transformations = [
+                item for item in transformations
+                if item["implementation"] == "full_invariant"
+            ]
+            lines.append(
+                f"The full path also had {sum(not item['output']['exact'] for item in full_transformations)}/"
+                f"{len(full_transformations)} failures across restored permutations and partitioning "
+                "at B=2/4/8/16/32."
+            )
     else:
         lines.append("Unavailable.")
 

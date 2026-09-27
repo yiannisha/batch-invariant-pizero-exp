@@ -35,7 +35,9 @@ def write_csv(path: Path, rows: list[dict]) -> None:
     if not rows:
         return
     with path.open("w", newline="") as stream:
-        writer = csv.DictWriter(stream, fieldnames=list(rows[0]))
+        writer = csv.DictWriter(
+            stream, fieldnames=list(rows[0]), lineterminator="\n"
+        )
         writer.writeheader()
         writer.writerows(rows)
 
@@ -88,29 +90,31 @@ def policy_rows(records: list[dict]) -> list[dict]:
     for record in records:
         if record.get("transformation") == "singleton" or record.get("batch_size") == 1:
             continue
-        groups[record["implementation"]].append(record)
+        groups[(record["implementation"], record.get("dtype", "unknown"))].append(record)
     rows = []
-    for implementation in LABELS:
-        values = groups.get(implementation, [])
-        if not values:
-            continue
-        violations = [item for item in values if not metric(item)["exact"]]
-        request_violations = {
-            item["request_id"] for item in violations
-        }
-        requests = {item["request_id"] for item in values}
-        rows.append(
-            {
-                "Implementation": LABELS[implementation],
-                "Violations (%)": f"{100 * len(request_violations) / len(requests):.3f}",
-                "Exact violation count": len(request_violations),
-                "Arrangement violations": len(violations),
-                "Arrangements": len(values),
-                "Max action error": max(
-                    metric(item)["max_absolute_error"] for item in values
-                ),
+    for dtype in sorted({key[1] for key in groups}):
+        for implementation in LABELS:
+            values = groups.get((implementation, dtype), [])
+            if not values:
+                continue
+            violations = [item for item in values if not metric(item)["exact"]]
+            request_violations = {
+                item["request_id"] for item in violations
             }
-        )
+            requests = {item["request_id"] for item in values}
+            rows.append(
+                {
+                    "Implementation": LABELS[implementation],
+                    "Precision": dtype,
+                    "Violations (%)": f"{100 * len(request_violations) / len(requests):.3f}",
+                    "Exact violation count": len(request_violations),
+                    "Arrangement violations": len(violations),
+                    "Arrangements": len(values),
+                    "Max action error": max(
+                        metric(item)["max_absolute_error"] for item in values
+                    ),
+                }
+            )
     return rows
 
 
@@ -158,7 +162,11 @@ def main() -> None:
     parser.add_argument("--output-dir", type=Path, default=Path("artifacts/tables"))
     args = parser.parse_args()
     operators = operator_rows(read_jsonl(args.operator))
-    policy_source = read_jsonl(args.policy) or read_jsonl(args.diagnostic_policy)
+    policy_source = read_jsonl(args.policy)
+    if not policy_source:
+        policy_source = read_jsonl(args.diagnostic_policy)
+        policy_source += read_jsonl(Path("results/diagnostic/policy_ablation_large_batches.jsonl"))
+        policy_source += read_jsonl(Path("results/diagnostic/policy_ablation_bfloat16.jsonl"))
     policies = policy_rows(policy_source)
     simpler = simpler_rows(read_jsonl(args.simpler))
     args.output_dir.mkdir(parents=True, exist_ok=True)

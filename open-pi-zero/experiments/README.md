@@ -78,6 +78,7 @@ python experiments/benchmark_serving.py --checkpoint "$PIZERO_CHECKPOINT"
 python experiments/generate_tables.py
 python experiments/generate_figures.py
 python experiments/generate_report.py
+python experiments/audit_results.py
 ```
 
 Policy benchmark defaults implement five sessions, 20 warm-ups per session,
