@@ -8,9 +8,11 @@ processes.
 
 Clone `thinking-machines-lab/batch_invariant_ops` beside
 `batch-invariant-pizero` and check out PR #27 revision
-`679da28bd038c8e3d7c161b0486cac9c54c4f967`. The integration shim only
-normalizes PyTorch 2.8's one-element Conv2d dispatcher parameter lists; it does
-not change kernel arithmetic.
+`679da28bd038c8e3d7c161b0486cac9c54c4f967`. On Triton 3.4, apply the recorded
+integration commit `14dafb5fd84350dc796a96cbecb566ca6295593f`; it selects IEEE
+input precision for FP32 Triton dot products after the PR diagnostic exposed
+the changed default. The policy-side integration shim normalizes PyTorch 2.8's
+one-element Conv2d dispatcher parameter lists.
 
 Download
 `allenzren/open-pi-zero/fractal_beta_step29576_2024-12-29_13-10_42.pt` and the
@@ -31,6 +33,7 @@ python "$BATCH_INVARIANT_OPS_REPO/scripts/check_conv2d_bmm_batch_invariance.py"
 python experiments/operator_campaign.py
 python experiments/policy_ablation.py --checkpoint "$PIZERO_CHECKPOINT"
 python experiments/local_operator_replay.py --checkpoint "$PIZERO_CHECKPOINT"
+python experiments/singleton_fidelity.py --checkpoint "$PIZERO_CHECKPOINT"
 ```
 
 The policy ablation exposes exactly these named modes: `native`,
@@ -73,6 +76,7 @@ python experiments/benchmark_policy.py --checkpoint "$PIZERO_CHECKPOINT"
 python experiments/benchmark_serving.py --checkpoint "$PIZERO_CHECKPOINT"
 python experiments/generate_tables.py
 python experiments/generate_figures.py
+python experiments/generate_report.py
 ```
 
 Policy benchmark defaults implement five sessions, 20 warm-ups per session,
