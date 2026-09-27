@@ -257,6 +257,78 @@ def dispatch_report() -> list[dict]:
                 "override_invocations": overrides.counts[override_name],
             }
         )
+
+    # Reductions and normalization-like paths are audited separately because
+    # ordinary attention uses softmax (not log_softmax) in this policy.  Mean
+    # and log_softmax have registered invariant replacements; softmax is a
+    # batch-local native kernel and is checked directly for exactness.
+    reduction_input = torch.randn(2, 277, 2048, device="cuda")
+    attention_input = torch.randn(2, 8, 4, 281, device="cuda")
+    auxiliary_cases = {
+        "rmsnorm_mean": {
+            "function": lambda value: torch.mean(value, dim=-1, keepdim=True),
+            "input": reduction_input,
+            "expected": "aten::mean",
+            "override": "mean",
+        },
+        "qualified_log_softmax": {
+            "function": lambda value: F.log_softmax(value, dim=-1),
+            "input": attention_input,
+            "expected": "aten::log_softmax",
+            "override": "log_softmax",
+        },
+        "attention_softmax": {
+            "function": lambda value: F.softmax(value, dim=-1),
+            "input": attention_input,
+            "expected": "aten::softmax",
+            "override": None,
+        },
+    }
+    for name, specification in auxiliary_cases.items():
+        function = specification["function"]
+        values = specification["input"]
+        with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA]) as prof:
+            function(values)
+            torch.cuda.synchronize()
+        operators = sorted(
+            {event.key for event in prof.key_averages() if event.key.startswith("aten::")}
+        )
+        if specification["expected"] not in operators:
+            raise RuntimeError(
+                f"{name} expected {specification['expected']}, observed {operators}"
+            )
+        singleton = function(values[:1])
+        batched = function(values)
+        torch.cuda.synchronize()
+        native_invariance = tensor_metrics(singleton, batched[:1])
+        override_name = specification["override"]
+        override_count = 0
+        if override_name is not None:
+            with implementation_context("full_invariant") as overrides:
+                function(values)
+                torch.cuda.synchronize()
+            override_count = overrides.counts[override_name]
+            if override_count == 0:
+                raise RuntimeError(f"{name} silently bypassed invariant {override_name}")
+        report.append(
+            {
+                "source_operation": name,
+                "dispatched_aten_operation": specification["expected"],
+                "tensor_ranks": [values.ndim],
+                "shapes": [list(values.shape)],
+                "strides": [list(values.stride())],
+                "dtype": str(values.dtype).removeprefix("torch."),
+                "observed_operators": operators,
+                "invariant_path_selected": override_name is not None,
+                "override_invocations": override_count,
+                "path_classification": (
+                    "registered_invariant_override"
+                    if override_name is not None
+                    else "audited_native_batch_local"
+                ),
+                "native_batch_invariance": native_invariance,
+            }
+        )
     return report
 
 

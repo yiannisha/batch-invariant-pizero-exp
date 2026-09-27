@@ -54,6 +54,20 @@ def main() -> None:
     ]
     assert len(invariant_operator) == 36_000
     assert all(item["invariance"]["exact"] for item in invariant_operator)
+    dispatch = json.loads((RESULTS / "operator" / "dispatch_report.json").read_text())
+    assert {item["source_operation"] for item in dispatch} == {
+        "rank2_mm", "rank3_attention", "siglip_projection", "rmsnorm_mean",
+        "qualified_log_softmax", "attention_softmax",
+    }
+    assert all(
+        item["invariant_path_selected"]
+        for item in dispatch if item["source_operation"] != "attention_softmax"
+    )
+    softmax = next(
+        item for item in dispatch if item["source_operation"] == "attention_softmax"
+    )
+    assert softmax["path_classification"] == "audited_native_batch_local"
+    assert softmax["native_batch_invariance"]["exact"]
 
     transformations = jsonl(RESULTS / "diagnostic" / "batch_transformations.jsonl")
     assert len(transformations) == 20
@@ -94,6 +108,7 @@ def main() -> None:
             "full_invariant_failures": sum(
                 not item["invariance"]["exact"] for item in invariant_operator
             ),
+            "dispatch_cases": len(dispatch),
         },
         "policy": {
             "float32_b2_b8": policy_audit(

@@ -79,6 +79,7 @@ def main() -> None:
     local_full = load_json(RESULTS / "diagnostic" / "local_replay_full_o_proj.json")
     fidelity = load_json(RESULTS / "diagnostic" / "singleton_fidelity.json")
     operator = load_jsonl(RESULTS / "operator" / "raw.jsonl")
+    dispatch = load_json(RESULTS / "operator" / "dispatch_report.json", [])
     kernel = load_json(RESULTS / "performance" / "kernel_summary.json", [])
     policy_perf = load_json(RESULTS / "performance" / "policy_summary.json", [])
     serving = load_json(RESULTS / "serving" / "summary.json", [])
@@ -296,6 +297,16 @@ def main() -> None:
             f"{sum(not item['invariance']['exact'] for item in invariant)} batch-invariance failures "
             f"across {len(invariant)} records."
         )
+        if dispatch:
+            lines.append(
+                "Dispatcher evidence covers: "
+                + ", ".join(
+                    f"`{item['source_operation']}`→`{item['dispatched_aten_operation']}` "
+                    f"({item.get('path_classification', 'registered_invariant_override')})"
+                    for item in dispatch
+                )
+                + "."
+            )
     else:
         lines.append("Operator campaign unavailable.")
 
