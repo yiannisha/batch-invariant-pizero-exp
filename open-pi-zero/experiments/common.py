@@ -22,6 +22,13 @@ import numpy as np
 import torch
 from omegaconf import OmegaConf
 
+# Pin rather than inherit framework-version defaults.  The primary policy
+# configuration preserves cuDNN's TF32 convolution path while requiring IEEE
+# FP32 for matmul; both choices are recorded in results/environment.json.
+torch.backends.cuda.matmul.allow_tf32 = False
+torch.backends.cudnn.allow_tf32 = True
+torch.set_float32_matmul_precision("highest")
+
 from src.model.attention import attention_implementation
 from src.model.vla.pizero import PiZeroInference
 
