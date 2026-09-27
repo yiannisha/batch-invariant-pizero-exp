@@ -21,7 +21,11 @@ from experiments.common import (
     utc_timestamp,
     write_json,
 )
-from experiments.simpler_support import FractalSimplerAdapter, observation_state
+from experiments.simpler_support import (
+    FractalSimplerAdapter,
+    make_simpler_env,
+    observation_state,
+)
 
 
 TASKS = {
@@ -63,11 +67,12 @@ def main() -> None:
     parser.add_argument("--episodes-per-task", type=int, default=25)
     parser.add_argument("--observations-per-episode", type=int, default=10)
     parser.add_argument("--seed", type=int, default=20250117)
+    parser.add_argument("--simpler-python", type=Path)
+    parser.add_argument("--simpler-root", type=Path)
+    parser.add_argument("--vulkan-icd", type=Path)
     args = parser.parse_args()
     if args.manifest.exists():
         raise FileExistsError(args.manifest)
-    import simpler_env
-
     seed_everything(args.seed)
     freeze = load_numerical_freeze(args.freeze, args.checkpoint)
     model, config = load_pretrained_policy(
@@ -77,7 +82,12 @@ def main() -> None:
     records = []
     episodes = []
     for task_index, (task_name, environment_name) in enumerate(TASKS.items()):
-        env = simpler_env.make(environment_name)
+        env = make_simpler_env(
+            environment_name,
+            args.simpler_python,
+            args.simpler_root,
+            args.vulkan_icd,
+        )
         for episode_index in range(args.episodes_per_task):
             reset_seed = args.seed + task_index * 10_000 + episode_index
             observation, reset_info = env.reset(

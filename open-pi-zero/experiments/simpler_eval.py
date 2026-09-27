@@ -19,7 +19,11 @@ from experiments.common import (
 )
 from experiments.heldout_invariance import concatenate, raw_request
 from experiments.prepare_replay import TASKS
-from experiments.simpler_support import FractalSimplerAdapter, observation_state
+from experiments.simpler_support import (
+    FractalSimplerAdapter,
+    make_simpler_env,
+    observation_state,
+)
 
 
 CONDITIONS = {
@@ -64,11 +68,12 @@ def main() -> None:
     parser.add_argument("--initializations", type=int, default=50)
     parser.add_argument("--seed", type=int, default=20250311)
     parser.add_argument("--resume", action="store_true")
+    parser.add_argument("--simpler-python", type=Path)
+    parser.add_argument("--simpler-root", type=Path)
+    parser.add_argument("--vulkan-icd", type=Path)
     args = parser.parse_args()
     if args.output.exists() and not args.resume:
         raise FileExistsError(f"refusing to overwrite {args.output}; use --resume")
-    import simpler_env
-
     freeze = load_numerical_freeze(args.freeze, args.checkpoint)
     model, config = load_pretrained_policy(
         args.checkpoint, config_path=args.config, dtype=torch.float32
@@ -96,7 +101,12 @@ def main() -> None:
     already_done = completed(args.output)
 
     for task, environment_name in TASKS.items():
-        env = simpler_env.make(environment_name)
+        env = make_simpler_env(
+            environment_name,
+            args.simpler_python,
+            args.simpler_root,
+            args.vulkan_icd,
+        )
         for initialization_id in range(args.initializations):
             for condition, (implementation, dynamic) in CONDITIONS.items():
                 if (task, initialization_id, condition) in already_done:
