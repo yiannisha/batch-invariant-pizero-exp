@@ -1,0 +1,8 @@
+| Implementation | Violations (%) | Exact violation count | Arrangement violations | Arrangements | Max action error |
+| --- | --- | --- | --- | --- | --- |
+| Native | 100.000 | 1 | 18 | 18 | 1.800060272216797e-05 |
+| Native + deterministic settings | 100.000 | 1 | 18 | 18 | 1.800060272216797e-05 |
+| Existing invariant operators | 100.000 | 1 | 18 | 18 | 1.8477439880371094e-05 |
+| Operators + patch projection | 100.000 | 1 | 18 | 18 | 2.2798776626586914e-06 |
+| Explicit per-matrix reference | 100.000 | 1 | 18 | 18 | 2.1904706954956055e-06 |
+| Persistent BMM + audited path | 0.000 | 0 | 0 | 18 | 0.0 |

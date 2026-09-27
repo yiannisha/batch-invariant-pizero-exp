@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import re
+import statistics
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -29,6 +30,15 @@ def metric(record: dict) -> dict:
 
 def fmt(value: float) -> str:
     return f"{value:.9g}"
+
+
+def percentile(values: list[float], quantile: float) -> float:
+    ordered = sorted(values)
+    index = (len(ordered) - 1) * quantile
+    lower = int(index)
+    upper = min(lower + 1, len(ordered) - 1)
+    fraction = index - lower
+    return ordered[lower] * (1 - fraction) + ordered[upper] * fraction
 
 
 def policy_summary(records: list[dict]) -> dict[str, dict]:
@@ -91,6 +101,23 @@ def main() -> None:
             f"{native['arrangements']} non-singleton arrangements violated ({arrangement_rate:.3f}%). "
             f"The maximum normalized action error was {fmt(native['max_error'])}.",
         ]
+        native_records = [
+            item for item in (heldout or diagnostic)
+            if item["implementation"] == "native" and item.get("batch_size") != 1
+        ]
+        errors = [metric(item)["max_absolute_error"] for item in native_records]
+        transformations = sorted({
+            item.get("transformation", "batch_position") for item in native_records
+        })
+        batch_sizes = sorted({item["batch_size"] for item in native_records})
+        positions = sorted({str(item["target_batch_position"]) for item in native_records})
+        companions = sorted({item["companion_type"] for item in native_records})
+        lines += [
+            f"Tested transformations={transformations}, batch sizes={batch_sizes}, target "
+            f"positions={positions}, companions={companions}. Across arrangement-level maximum "
+            f"errors: median={fmt(statistics.median(errors))}, p95={fmt(percentile(errors, 0.95))}, "
+            f"p99={fmt(percentile(errors, 0.99))}."
+        ]
     else:
         lines += ["Unavailable: no policy-level records were produced."]
     if not heldout:
@@ -148,11 +175,20 @@ def main() -> None:
         lines.append("Unavailable.")
 
     lines += ["", "## F. Do numerical differences affect behavior?", ""]
-    if simpler_blocker:
+    if native:
         lines.append(
-            "Unavailable: no SIMPLER episodes were executed. "
-            + simpler_blocker.get("summary", "The simulator blocker is recorded in results/simpler/blocker.json.")
+            f"- Action divergence: measured in the {scope} numerical campaign; "
+            f"{native['arrangement_violations']}/{native['arrangements']} native arrangements differed."
         )
+    if simpler_blocker:
+        lines += [
+            "- Trajectory divergence: unavailable; no SIMPLER episode could reach `env.reset`.",
+            "- Paired success disagreement: unavailable; 0/800 planned episodes were executed.",
+            "- Success-rate differences: unavailable; no behavioral outcome is inferred from the numerical results.",
+            "The container exposed CUDA compute but not the NVIDIA graphics/Vulkan ICD required by "
+            "SAPIEN 2.2.2; native rendering segfaulted and the Lavapipe fallback lacked a required "
+            "Vulkan extension. Full evidence is retained in `results/simpler/blocker.json`.",
+        ]
     else:
         lines.append("Unavailable: no SIMPLER episode records were produced.")
 
@@ -184,7 +220,12 @@ def main() -> None:
             subset = [item for item in serving if item["configuration"] == configuration]
             lines.append(
                 f"- `{configuration}`: {count} offered-load points; numerical contract satisfied "
-                f"at {sum(item['numerical_contract_satisfied'] for item in subset)}/{count} points."
+                f"at {sum(item['numerical_contract_satisfied'] for item in subset)}/{count} points. "
+                + "; ".join(
+                    f"load {item['offered_load']:g}: {fmt(item['throughput_requests_per_second'])} req/s, "
+                    f"p95 {fmt(item['p95_arrival_to_completion_ms'])} ms"
+                    for item in subset
+                )
             )
     else:
         lines.append("Serving/load measurements unavailable.")

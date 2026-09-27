@@ -1,0 +1,31 @@
+{
+  "comparison": "full_invariant_singleton_vs_native_singleton",
+  "dtype": "float32",
+  "full_invariant_override_invocations": {
+    "addmm": 204,
+    "bmm": 700,
+    "convolution": 1,
+    "log_softmax": 0,
+    "mean": 440,
+    "mm": 1470
+  },
+  "metrics": {
+    "exact": false,
+    "max_absolute_error": 1.4603137969970703e-06,
+    "mean_absolute_error": 4.493631422519684e-07,
+    "nonfinite_count": 0,
+    "relative_l2_error": 1.4728523420963992e-06,
+    "rmse": 5.783669585023543e-07,
+    "shape": [
+      1,
+      4,
+      7
+    ],
+    "shape_equal": true,
+    "unequal_element_count": 25,
+    "unequal_element_fraction": 0.8928571428571429
+  },
+  "request_id": "synthetic-diagnostic/episode-000/observation-000/noise-000",
+  "schema_version": 1,
+  "timestamp": "2026-09-27T21:23:32.647083+00:00"
+}

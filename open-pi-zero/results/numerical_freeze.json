@@ -1,0 +1,12 @@
+{
+  "batch_invariant_ops_sha": "14dafb5fd84350dc796a96cbecb566ca6295593f",
+  "batch_invariant_pizero_sha": "a2576bbac02fca0ba1868843475f4a644835bdf1",
+  "checkpoint": {
+    "path": "/dev/shm/pizero-assets/checkpoint/fractal_beta_step29576_2024-12-29_13-10_42.pt",
+    "sha256": "1da40985d963ddf394fa63e7db5ddd4cd8082d5c6ce0b2a0cae56abd8b6ec0eb"
+  },
+  "dirty_status": [],
+  "frozen_at": "2026-09-27T21:27:10.293098+00:00",
+  "numerical_implementation_frozen": true,
+  "schema_version": 1
+}

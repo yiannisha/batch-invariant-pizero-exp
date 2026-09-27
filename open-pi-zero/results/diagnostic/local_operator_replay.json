@@ -1,0 +1,96 @@
+{
+  "batch_size": 2,
+  "batched_input": {
+    "contiguous": true,
+    "dtype": "float32",
+    "rank": 3,
+    "shape": [
+      2,
+      1,
+      8
+    ],
+    "stride": [
+      8,
+      8,
+      1
+    ]
+  },
+  "captured_output_comparison": {
+    "exact": false,
+    "max_absolute_error": 1.1920928955078125e-07,
+    "mean_absolute_error": 1.3946191756986082e-08,
+    "nonfinite_count": 0,
+    "relative_l2_error": 6.377896142655744e-08,
+    "rmse": 2.4069765168422318e-08,
+    "shape": [
+      1,
+      1,
+      1024
+    ],
+    "shape_equal": true,
+    "unequal_element_count": 489,
+    "unequal_element_fraction": 0.4775390625
+  },
+  "classification": "local_batch_sensitive_operator",
+  "dispatched_aten_operations": [
+    "aten::addmm",
+    "aten::as_strided",
+    "aten::linear",
+    "aten::reshape",
+    "aten::t",
+    "aten::transpose",
+    "aten::view"
+  ],
+  "implementation": "native",
+  "input_comparison": {
+    "exact": true,
+    "max_absolute_error": 0.0,
+    "mean_absolute_error": 0.0,
+    "nonfinite_count": 0,
+    "relative_l2_error": 0.0,
+    "rmse": 0.0,
+    "shape": [
+      1,
+      1,
+      8
+    ],
+    "shape_equal": true,
+    "unequal_element_count": 0,
+    "unequal_element_fraction": 0.0
+  },
+  "invocation": 0,
+  "local_replay_comparison": {
+    "exact": false,
+    "max_absolute_error": 1.1920928955078125e-07,
+    "mean_absolute_error": 1.3946191756986082e-08,
+    "nonfinite_count": 0,
+    "relative_l2_error": 6.377896142655744e-08,
+    "rmse": 2.4069765168422318e-08,
+    "shape": [
+      1,
+      1,
+      1024
+    ],
+    "shape_equal": true,
+    "unequal_element_count": 489,
+    "unequal_element_fraction": 0.4775390625
+  },
+  "module": "proprio_encoder",
+  "schema_version": 1,
+  "singleton_input": {
+    "contiguous": true,
+    "dtype": "float32",
+    "rank": 3,
+    "shape": [
+      1,
+      1,
+      8
+    ],
+    "stride": [
+      8,
+      8,
+      1
+    ]
+  },
+  "timestamp": "2026-09-27T21:23:56.058043+00:00"
+}
