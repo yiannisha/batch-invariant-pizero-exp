@@ -1,0 +1,159 @@
+{
+  "audited_at": "2026-09-27T23:05:22.307942+00:00",
+  "blocked": {
+    "affected_campaigns": [
+      "100-episode frozen replay collection",
+      "800-episode paired closed-loop SIMPLER campaign"
+    ],
+    "attempted_initialization": 0,
+    "attempted_task": "google_robot_pick_horizontal_coke_can",
+    "conclusion": "This container exposes CUDA compute but not the NVIDIA graphics/Vulkan driver capabilities required by SAPIEN 2.2.2. Both native and CPU Vulkan initialization fail before an episode can be reset, so no SIMPLER episode or replay observation can be collected on this instance.",
+    "evidence": {
+      "lavapipe_error": "vk::PhysicalDevice::createDeviceUnique: ErrorExtensionNotPresent",
+      "lavapipe_fallback": "mesa-vulkan-drivers 25.2.8 installed and VK_ICD_FILENAMES set to lvp_icd.json",
+      "native_renderer_error": "Vulkan is incompatible with your driver; SAPIEN process segfaulted before env.reset",
+      "nvidia_driver_capabilities": "compute,utility",
+      "nvidia_visible_devices_environment": "void",
+      "nvidia_vulkan_icd_present": false
+    },
+    "required_external_change": "Restart the machine/container with NVIDIA graphics capability and its Vulkan ICD mounted (for Docker, NVIDIA_DRIVER_CAPABILITIES must include graphics), then rerun experiments/prepare_replay.py and experiments/simpler_eval.py without changing the frozen policy implementation.",
+    "simulator": {
+      "maniskill2_real2sim_revision": "91d154bfd864577f8d2e80f3fc2f8b4d9df9ae5c",
+      "python": "3.10.18",
+      "sapien": "2.2.2",
+      "simpler_env_version": "0.0.1",
+      "simpler_repository": "allenzren/SimplerEnv"
+    },
+    "status": "blocked_before_episode_reset",
+    "timestamp": "2026-09-27T20:52:06Z"
+  },
+  "operator": {
+    "configurations": 720,
+    "full_invariant_failures": 0,
+    "full_invariant_records": 36000,
+    "records": 72000
+  },
+  "performance": {
+    "kernel_timing_samples": 3600,
+    "policy_timing_samples": 4000,
+    "serving_load_points": 20,
+    "serving_requests": 4000
+  },
+  "policy": {
+    "bfloat16_b2_b8": {
+      "implementations": {
+        "existing_invariant_ops": {
+          "arrangements": 18,
+          "maximum_error": 0.001953125,
+          "violations": 6
+        },
+        "explicit_per_matrix_attention": {
+          "arrangements": 18,
+          "maximum_error": 0.0,
+          "violations": 0
+        },
+        "full_invariant": {
+          "arrangements": 18,
+          "maximum_error": 0.0,
+          "violations": 0
+        },
+        "invariant_plus_patch_projection": {
+          "arrangements": 18,
+          "maximum_error": 0.00390625,
+          "violations": 6
+        },
+        "native": {
+          "arrangements": 18,
+          "maximum_error": 0.0087890625,
+          "violations": 18
+        },
+        "native_deterministic": {
+          "arrangements": 18,
+          "maximum_error": 0.0087890625,
+          "violations": 18
+        }
+      },
+      "records": 114
+    },
+    "float32_b16_b32": {
+      "implementations": {
+        "existing_invariant_ops": {
+          "arrangements": 12,
+          "maximum_error": 2.372264862060547e-05,
+          "violations": 12
+        },
+        "explicit_per_matrix_attention": {
+          "arrangements": 12,
+          "maximum_error": 2.6226043701171875e-06,
+          "violations": 12
+        },
+        "full_invariant": {
+          "arrangements": 12,
+          "maximum_error": 0.0,
+          "violations": 0
+        },
+        "invariant_plus_patch_projection": {
+          "arrangements": 12,
+          "maximum_error": 2.6226043701171875e-06,
+          "violations": 12
+        },
+        "native": {
+          "arrangements": 12,
+          "maximum_error": 2.47955322265625e-05,
+          "violations": 12
+        },
+        "native_deterministic": {
+          "arrangements": 12,
+          "maximum_error": 2.47955322265625e-05,
+          "violations": 12
+        }
+      },
+      "records": 72
+    },
+    "float32_b2_b8": {
+      "implementations": {
+        "existing_invariant_ops": {
+          "arrangements": 18,
+          "maximum_error": 1.8477439880371094e-05,
+          "violations": 18
+        },
+        "explicit_per_matrix_attention": {
+          "arrangements": 18,
+          "maximum_error": 2.1904706954956055e-06,
+          "violations": 18
+        },
+        "full_invariant": {
+          "arrangements": 18,
+          "maximum_error": 0.0,
+          "violations": 0
+        },
+        "invariant_plus_patch_projection": {
+          "arrangements": 18,
+          "maximum_error": 2.2798776626586914e-06,
+          "violations": 18
+        },
+        "native": {
+          "arrangements": 18,
+          "maximum_error": 1.800060272216797e-05,
+          "violations": 18
+        },
+        "native_deterministic": {
+          "arrangements": 18,
+          "maximum_error": 1.800060272216797e-05,
+          "violations": 18
+        }
+      },
+      "records": 114
+    },
+    "full_invariant_transformation_failures": 0,
+    "transformation_records": 20
+  },
+  "provenance": {
+    "checkpoint_sha256": "1da40985d963ddf394fa63e7db5ddd4cd8082d5c6ce0b2a0cae56abd8b6ec0eb",
+    "environment_policy_sha": "167d8049cf41ee79cd7e9159b8dbec0ee159f2bf",
+    "numerical_policy_sha": "a2576bbac02fca0ba1868843475f4a644835bdf1",
+    "operator_sha": "14dafb5fd84350dc796a96cbecb566ca6295593f"
+  },
+  "schema_version": 1,
+  "status": "all_runnable_campaigns_verified"
+}

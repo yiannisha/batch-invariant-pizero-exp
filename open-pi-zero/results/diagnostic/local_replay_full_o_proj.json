@@ -1,0 +1,99 @@
+{
+  "batch_size": 2,
+  "batched_input": {
+    "contiguous": true,
+    "dtype": "float32",
+    "rank": 3,
+    "shape": [
+      2,
+      276,
+      2048
+    ],
+    "stride": [
+      565248,
+      2048,
+      1
+    ]
+  },
+  "captured_output_comparison": {
+    "exact": true,
+    "max_absolute_error": 0.0,
+    "mean_absolute_error": 0.0,
+    "nonfinite_count": 0,
+    "relative_l2_error": 0.0,
+    "rmse": 0.0,
+    "shape": [
+      1,
+      276,
+      2048
+    ],
+    "shape_equal": true,
+    "unequal_element_count": 0,
+    "unequal_element_fraction": 0.0
+  },
+  "classification": "locally_batch_invariant",
+  "dispatched_aten_operations": [
+    "aten::_unsafe_view",
+    "aten::as_strided",
+    "aten::empty",
+    "aten::linear",
+    "aten::matmul",
+    "aten::mm",
+    "aten::reshape",
+    "aten::t",
+    "aten::transpose",
+    "aten::view"
+  ],
+  "implementation": "full_invariant",
+  "input_comparison": {
+    "exact": true,
+    "max_absolute_error": 0.0,
+    "mean_absolute_error": 0.0,
+    "nonfinite_count": 0,
+    "relative_l2_error": 0.0,
+    "rmse": 0.0,
+    "shape": [
+      1,
+      276,
+      2048
+    ],
+    "shape_equal": true,
+    "unequal_element_count": 0,
+    "unequal_element_fraction": 0.0
+  },
+  "invocation": 0,
+  "local_replay_comparison": {
+    "exact": true,
+    "max_absolute_error": 0.0,
+    "mean_absolute_error": 0.0,
+    "nonfinite_count": 0,
+    "relative_l2_error": 0.0,
+    "rmse": 0.0,
+    "shape": [
+      1,
+      276,
+      2048
+    ],
+    "shape_equal": true,
+    "unequal_element_count": 0,
+    "unequal_element_fraction": 0.0
+  },
+  "module": "joint_model.mixtures.vlm.layers.0.self_attn.o_proj",
+  "schema_version": 1,
+  "singleton_input": {
+    "contiguous": true,
+    "dtype": "float32",
+    "rank": 3,
+    "shape": [
+      1,
+      276,
+      2048
+    ],
+    "stride": [
+      567296,
+      2048,
+      1
+    ]
+  },
+  "timestamp": "2026-09-27T23:00:26.132978+00:00"
+}

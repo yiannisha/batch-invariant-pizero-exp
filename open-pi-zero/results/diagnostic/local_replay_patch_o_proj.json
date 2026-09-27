@@ -1,0 +1,99 @@
+{
+  "batch_size": 2,
+  "batched_input": {
+    "contiguous": true,
+    "dtype": "float32",
+    "rank": 3,
+    "shape": [
+      2,
+      276,
+      2048
+    ],
+    "stride": [
+      565248,
+      2048,
+      1
+    ]
+  },
+  "captured_output_comparison": {
+    "exact": false,
+    "max_absolute_error": 0.0004425048828125,
+    "mean_absolute_error": 1.1441122308265084e-06,
+    "nonfinite_count": 0,
+    "relative_l2_error": 7.281185773775285e-07,
+    "rmse": 3.842187541725487e-06,
+    "shape": [
+      1,
+      276,
+      2048
+    ],
+    "shape_equal": true,
+    "unequal_element_count": 546677,
+    "unequal_element_fraction": 0.9671453945878623
+  },
+  "classification": "local_batch_sensitive_operator",
+  "dispatched_aten_operations": [
+    "aten::_unsafe_view",
+    "aten::as_strided",
+    "aten::empty",
+    "aten::linear",
+    "aten::matmul",
+    "aten::mm",
+    "aten::reshape",
+    "aten::t",
+    "aten::transpose",
+    "aten::view"
+  ],
+  "implementation": "invariant_plus_patch_projection",
+  "input_comparison": {
+    "exact": true,
+    "max_absolute_error": 0.0,
+    "mean_absolute_error": 0.0,
+    "nonfinite_count": 0,
+    "relative_l2_error": 0.0,
+    "rmse": 0.0,
+    "shape": [
+      1,
+      276,
+      2048
+    ],
+    "shape_equal": true,
+    "unequal_element_count": 0,
+    "unequal_element_fraction": 0.0
+  },
+  "invocation": 0,
+  "local_replay_comparison": {
+    "exact": false,
+    "max_absolute_error": 0.0004425048828125,
+    "mean_absolute_error": 1.1441122308265084e-06,
+    "nonfinite_count": 0,
+    "relative_l2_error": 7.281185773775285e-07,
+    "rmse": 3.842187541725487e-06,
+    "shape": [
+      1,
+      276,
+      2048
+    ],
+    "shape_equal": true,
+    "unequal_element_count": 546677,
+    "unequal_element_fraction": 0.9671453945878623
+  },
+  "module": "joint_model.mixtures.vlm.layers.0.self_attn.o_proj",
+  "schema_version": 1,
+  "singleton_input": {
+    "contiguous": true,
+    "dtype": "float32",
+    "rank": 3,
+    "shape": [
+      1,
+      276,
+      2048
+    ],
+    "stride": [
+      567296,
+      2048,
+      1
+    ]
+  },
+  "timestamp": "2026-09-27T22:59:17.988093+00:00"
+}

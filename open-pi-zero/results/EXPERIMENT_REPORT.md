@@ -11,9 +11,19 @@ This report is generated from the retained machine-readable measurements. Missin
 
 ## A. Does native inference violate request-level batch invariance?
 
-Yes within the synthetic diagnostic campaign: 1/1 requests violated (100.000%), and 18/18 non-singleton arrangements violated (100.000%). The maximum normalized action error was 1.80006027e-05.
-Tested transformations=['batch_position'], batch sizes=[2, 4, 8], target positions=['first', 'last', 'middle'], companions=['diverse', 'duplicate']. Across arrangement-level maximum errors: median=5.66244125e-07, p95=1.80006027e-05, p99=1.80006027e-05.
+Yes within the synthetic diagnostic campaign: 1/1 requests violated (100.000%), and 30/30 non-singleton arrangements violated (100.000%). The maximum normalized action error was 2.47955322e-05.
+Tested transformations=['batch_position'], batch sizes=[2, 4, 8, 16, 32], target positions=['first', 'last', 'middle'], companions=['diverse', 'duplicate']. Across arrangement-level maximum errors: median=1.80006027e-05, p95=2.47955322e-05, p99=2.47955322e-05.
 The required 2,400-request held-out result is unavailable because the replay dataset could not be collected in this container; this diagnostic result must not be read as a held-out rate.
+In the separate same-request-set transformation matrix, native failed 5/10 aggregate comparisons: all five partition changes failed, while all five restored permutations were exact.
+
+### Separate BF16 policy campaign
+
+- `native`: 18/18 arrangement violations; maximum error 0.0087890625.
+- `native_deterministic`: 18/18 arrangement violations; maximum error 0.0087890625.
+- `existing_invariant_ops`: 6/18 arrangement violations; maximum error 0.001953125.
+- `invariant_plus_patch_projection`: 6/18 arrangement violations; maximum error 0.00390625.
+- `explicit_per_matrix_attention`: 0/18 arrangement violations; maximum error 0.
+- `full_invariant`: 0/18 arrangement violations; maximum error 0.
 
 ## B. Where does native execution first diverge?
 
@@ -23,6 +33,8 @@ The required 2,400-request held-out result is unavailable because the replay dat
 - `invariant_plus_patch_projection`: prefill.step_0.action_joint_model.layer_0.post_attn.attn_outputs_final#invocation_0.vlm
 - `native`: proprio_embeds#invocation_0
 - `native_deterministic`: proprio_embeds#invocation_0
+Native local replay at `proprio_encoder` used bit-identical inputs and reproduced a max error of 1.1920929e-07 through aten::addmm, aten::as_strided, aten::linear, aten::reshape, aten::t, aten::transpose, aten::view.
+The VLM layer-0 output projection replay was locally batch-sensitive in both the patch-projection and explicit-attention modes (max 0.000442504883), but exact for the tested full-invariant input.
 
 ## C. How do differences propagate through the flow solver?
 
@@ -33,7 +45,8 @@ The required 2,400-request held-out result is unavailable because the replay dat
 
 ## D. Does the full invariant path achieve exact action equality?
 
-In the synthetic diagnostic records, 0/18 non-singleton arrangements failed exact equality; maximum error was 0.
+In the synthetic diagnostic records, 0/30 non-singleton arrangements failed exact equality; maximum error was 0.
+The full path also had 0/10 failures across restored permutations and partitioning at B=2/4/8/16/32.
 
 ## E. How faithful is invariant singleton inference to native singleton inference?
 
@@ -41,7 +54,7 @@ For the frozen synthetic diagnostic singleton: exact=False, max absolute error=1
 
 ## F. Do numerical differences affect behavior?
 
-- Action divergence: measured in the synthetic diagnostic numerical campaign; 18/18 native arrangements differed.
+- Action divergence: measured in the synthetic diagnostic numerical campaign; 30/30 native arrangements differed.
 - Trajectory divergence: unavailable; no SIMPLER episode could reach `env.reset`.
 - Paired success disagreement: unavailable; 0/800 planned episodes were executed.
 - Success-rate differences: unavailable; no behavioral outcome is inferred from the numerical results.
@@ -75,4 +88,4 @@ The container exposed CUDA compute but not the NVIDIA graphics/Vulkan ICD requir
 
 ## Operator qualification
 
-Retained 28800 operator records. The full-invariant path had 0 batch-invariance failures across 14400 records.
+Retained 72000 operator records. The full-invariant path had 0 batch-invariance failures across 36000 records.

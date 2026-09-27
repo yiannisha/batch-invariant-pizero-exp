@@ -1,7 +1,13 @@
-Implementation,Violations (%),Exact violation count,Arrangement violations,Arrangements,Max action error
-Native,100.000,1,18,18,1.800060272216797e-05
-Native + deterministic settings,100.000,1,18,18,1.800060272216797e-05
-Existing invariant operators,100.000,1,18,18,1.8477439880371094e-05
-Operators + patch projection,100.000,1,18,18,2.2798776626586914e-06
-Explicit per-matrix reference,100.000,1,18,18,2.1904706954956055e-06
-Persistent BMM + audited path,0.000,0,0,18,0.0
+Implementation,Precision,Violations (%),Exact violation count,Arrangement violations,Arrangements,Max action error
+Native,bfloat16,100.000,1,18,18,0.0087890625
+Native + deterministic settings,bfloat16,100.000,1,18,18,0.0087890625
+Existing invariant operators,bfloat16,100.000,1,6,18,0.001953125
+Operators + patch projection,bfloat16,100.000,1,6,18,0.00390625
+Explicit per-matrix reference,bfloat16,0.000,0,0,18,0.0
+Persistent BMM + audited path,bfloat16,0.000,0,0,18,0.0
+Native,float32,100.000,1,30,30,2.47955322265625e-05
+Native + deterministic settings,float32,100.000,1,30,30,2.47955322265625e-05
+Existing invariant operators,float32,100.000,1,30,30,2.372264862060547e-05
+Operators + patch projection,float32,100.000,1,30,30,2.6226043701171875e-06
+Explicit per-matrix reference,float32,100.000,1,30,30,2.6226043701171875e-06
+Persistent BMM + audited path,float32,0.000,0,0,30,0.0
