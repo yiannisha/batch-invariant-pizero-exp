@@ -39,7 +39,7 @@
       "pr_27_base_revision": "679da28bd038c8e3d7c161b0486cac9c54c4f967"
     },
     "batch_invariant_pizero": {
-      "git_sha": "167d8049cf41ee79cd7e9159b8dbec0ee159f2bf",
+      "git_sha": "a3188d11916063d8ffd6ea327383fb2a50240d2e",
       "path": "/workspace/current-paper-experiment-workdir/batch-invariant-pizero"
     }
   },
@@ -56,5 +56,5 @@
     "transformers": "4.57.1",
     "triton": "3.4.0"
   },
-  "timestamp": "2026-09-27T23:05:07.688419+00:00"
+  "timestamp": "2026-09-27T23:08:13.759765+00:00"
 }

@@ -89,3 +89,4 @@ The container exposed CUDA compute but not the NVIDIA graphics/Vulkan ICD requir
 ## Operator qualification
 
 Retained 72000 operator records. The full-invariant path had 0 batch-invariance failures across 36000 records.
+Dispatcher evidence covers: `rank2_mm`→`aten::mm` (registered_invariant_override), `rank3_attention`→`aten::bmm` (registered_invariant_override), `siglip_projection`→`aten::convolution` (registered_invariant_override), `rmsnorm_mean`→`aten::mean` (registered_invariant_override), `qualified_log_softmax`→`aten::log_softmax` (registered_invariant_override), `attention_softmax`→`aten::softmax` (audited_native_batch_local).

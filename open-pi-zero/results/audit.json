@@ -1,5 +1,5 @@
 {
-  "audited_at": "2026-09-27T23:05:22.307942+00:00",
+  "audited_at": "2026-09-27T23:08:25.964475+00:00",
   "blocked": {
     "affected_campaigns": [
       "100-episode frozen replay collection",
@@ -29,6 +29,7 @@
   },
   "operator": {
     "configurations": 720,
+    "dispatch_cases": 6,
     "full_invariant_failures": 0,
     "full_invariant_records": 36000,
     "records": 72000
@@ -150,7 +151,7 @@
   },
   "provenance": {
     "checkpoint_sha256": "1da40985d963ddf394fa63e7db5ddd4cd8082d5c6ce0b2a0cae56abd8b6ec0eb",
-    "environment_policy_sha": "167d8049cf41ee79cd7e9159b8dbec0ee159f2bf",
+    "environment_policy_sha": "a3188d11916063d8ffd6ea327383fb2a50240d2e",
     "numerical_policy_sha": "a2576bbac02fca0ba1868843475f4a644835bdf1",
     "operator_sha": "14dafb5fd84350dc796a96cbecb566ca6295593f"
   },

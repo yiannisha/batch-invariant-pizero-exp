@@ -115,5 +115,145 @@
       4,
       4
     ]
+  },
+  {
+    "dispatched_aten_operation": "aten::mean",
+    "dtype": "float32",
+    "invariant_path_selected": true,
+    "native_batch_invariance": {
+      "exact": true,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "nonfinite_count": 0,
+      "relative_l2_error": 0.0,
+      "rmse": 0.0,
+      "shape": [
+        1,
+        277,
+        1
+      ],
+      "shape_equal": true,
+      "unequal_element_count": 0,
+      "unequal_element_fraction": 0.0
+    },
+    "observed_operators": [
+      "aten::mean"
+    ],
+    "override_invocations": 1,
+    "path_classification": "registered_invariant_override",
+    "shapes": [
+      [
+        2,
+        277,
+        2048
+      ]
+    ],
+    "source_operation": "rmsnorm_mean",
+    "strides": [
+      [
+        567296,
+        2048,
+        1
+      ]
+    ],
+    "tensor_ranks": [
+      3
+    ]
+  },
+  {
+    "dispatched_aten_operation": "aten::log_softmax",
+    "dtype": "float32",
+    "invariant_path_selected": true,
+    "native_batch_invariance": {
+      "exact": true,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "nonfinite_count": 0,
+      "relative_l2_error": 0.0,
+      "rmse": 0.0,
+      "shape": [
+        1,
+        8,
+        4,
+        281
+      ],
+      "shape_equal": true,
+      "unequal_element_count": 0,
+      "unequal_element_fraction": 0.0
+    },
+    "observed_operators": [
+      "aten::_log_softmax",
+      "aten::log_softmax"
+    ],
+    "override_invocations": 1,
+    "path_classification": "registered_invariant_override",
+    "shapes": [
+      [
+        2,
+        8,
+        4,
+        281
+      ]
+    ],
+    "source_operation": "qualified_log_softmax",
+    "strides": [
+      [
+        8992,
+        1124,
+        281,
+        1
+      ]
+    ],
+    "tensor_ranks": [
+      4
+    ]
+  },
+  {
+    "dispatched_aten_operation": "aten::softmax",
+    "dtype": "float32",
+    "invariant_path_selected": false,
+    "native_batch_invariance": {
+      "exact": true,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "nonfinite_count": 0,
+      "relative_l2_error": 0.0,
+      "rmse": 0.0,
+      "shape": [
+        1,
+        8,
+        4,
+        281
+      ],
+      "shape_equal": true,
+      "unequal_element_count": 0,
+      "unequal_element_fraction": 0.0
+    },
+    "observed_operators": [
+      "aten::_softmax",
+      "aten::softmax"
+    ],
+    "override_invocations": 0,
+    "path_classification": "audited_native_batch_local",
+    "shapes": [
+      [
+        2,
+        8,
+        4,
+        281
+      ]
+    ],
+    "source_operation": "attention_softmax",
+    "strides": [
+      [
+        8992,
+        1124,
+        281,
+        1
+      ]
+    ],
+    "tensor_ranks": [
+      4
+    ]
   }
 ]
