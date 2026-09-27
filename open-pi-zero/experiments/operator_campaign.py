@@ -20,6 +20,47 @@ from experiments.common import (
 
 
 BATCH_SIZES = (1, 2, 4, 8, 16, 31, 32, 33, 64)
+ATTENTION_CASES = {
+    # Shapes observed in the frozen pretrained trace.  The leading dimension
+    # is request batch times attention heads.
+    "qkt": {
+        "heads": 8,
+        "left": (4, 256),
+        "right": (256, 281),
+        "source": "Action attention QK^T",
+    },
+    "pv": {
+        "heads": 8,
+        "left": (4, 281),
+        "right": (281, 256),
+        "source": "Action attention PV",
+    },
+    "prefill_qkt": {
+        "heads": 8,
+        "left": (277, 256),
+        "right": (256, 277),
+        "source": "Joint prefill attention QK^T",
+    },
+    "prefill_pv": {
+        "heads": 8,
+        "left": (277, 277),
+        "right": (277, 256),
+        "source": "Joint prefill attention PV",
+    },
+    "vision_qkt": {
+        "heads": 16,
+        "left": (256, 72),
+        "right": (72, 256),
+        "source": "SigLIP attention QK^T",
+    },
+    "vision_pv": {
+        "heads": 16,
+        "left": (256, 256),
+        "right": (256, 72),
+        "source": "SigLIP attention PV",
+    },
+}
+OPERATIONS = ("conv2d", *ATTENTION_CASES)
 
 
 def conv_case(batch_size: int, dtype: torch.dtype, seed: int, layout: str):
@@ -44,19 +85,10 @@ def attention_case(
     operation: str, batch_size: int, dtype: torch.dtype, seed: int, layout: str
 ):
     generator = torch.Generator(device="cuda").manual_seed(seed)
-    heads = 8
-    if operation == "qkt":
-        left_shape, right_shape = (batch_size * heads, 4, 256), (
-            batch_size * heads,
-            256,
-            281,
-        )
-    else:
-        left_shape, right_shape = (batch_size * heads, 4, 281), (
-            batch_size * heads,
-            281,
-            256,
-        )
+    case = ATTENTION_CASES[operation]
+    heads = case["heads"]
+    left_shape = (batch_size * heads, *case["left"])
+    right_shape = (batch_size * heads, *case["right"])
     if layout == "transposed":
         left = torch.randn(
             left_shape[0], left_shape[2], left_shape[1],
@@ -110,7 +142,8 @@ def run_one(
         def calculate(pair):
             return torch.bmm(*pair)
 
-        target_input, batched_input = (left[:8], right[:8]), (left, right)
+        heads = ATTENTION_CASES[operation]["heads"]
+        target_input, batched_input = (left[:heads], right[:heads]), (left, right)
         input_shapes = [list(left.shape), list(right.shape)]
         input_strides = [list(left.stride()), list(right.stride())]
 
@@ -118,7 +151,7 @@ def run_one(
         singleton = calculate(target_input)
         batched = calculate(batched_input)
         torch.cuda.synchronize()
-    target_count = 1 if operation == "conv2d" else 8
+    target_count = 1 if operation == "conv2d" else ATTENTION_CASES[operation]["heads"]
     invariance = tensor_metrics(singleton, batched[:target_count])
 
     with implementation_context("native"):
@@ -130,9 +163,11 @@ def run_one(
         "experiment_id": str(uuid.uuid4()),
         "timestamp": utc_timestamp(),
         "operator": operation,
-        "source_operation": "SigLIP patch projection"
-        if operation == "conv2d"
-        else ("QK^T" if operation == "qkt" else "PV"),
+        "source_operation": (
+            "SigLIP patch projection"
+            if operation == "conv2d"
+            else ATTENTION_CASES[operation]["source"]
+        ),
         "dispatched_aten_operation": "aten::convolution"
         if operation == "conv2d"
         else "aten::bmm",
@@ -160,7 +195,9 @@ def run_one(
                 values[:1].double(), weight.double(), bias.double(), stride=14
             )
         else:
-            reference = torch.bmm(left[:8].double(), right[:8].double())
+            reference = torch.bmm(
+                left[:target_count].double(), right[:target_count].double()
+            )
         record["fidelity_to_fp64"] = tensor_metrics(reference, batched[:target_count])
     return record
 
@@ -232,6 +269,7 @@ def main() -> None:
         "--dtypes", nargs="+", choices=("float32", "bfloat16", "float16"), default=("float32", "bfloat16")
     )
     parser.add_argument("--layouts", nargs="+", default=("contiguous", "transposed", "noncontiguous"))
+    parser.add_argument("--operations", nargs="+", choices=OPERATIONS, default=OPERATIONS)
     parser.add_argument("--resume", action="store_true")
     args = parser.parse_args()
     if args.output.exists() and not args.resume:
@@ -256,7 +294,7 @@ def main() -> None:
     dtypes = {name: getattr(torch, name) for name in args.dtypes}
     written = 0
     for operation, implementation, batch_size, dtype_name, seed, layout in itertools.product(
-        ("conv2d", "qkt", "pv"),
+        args.operations,
         ("native", "full_invariant"),
         args.batch_sizes,
         args.dtypes,

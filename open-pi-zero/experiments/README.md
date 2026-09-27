@@ -32,6 +32,7 @@ python experiments/record_environment.py --checkpoint "$PIZERO_CHECKPOINT"
 python "$BATCH_INVARIANT_OPS_REPO/scripts/check_conv2d_bmm_batch_invariance.py"
 python experiments/operator_campaign.py
 python experiments/policy_ablation.py --checkpoint "$PIZERO_CHECKPOINT"
+python experiments/batch_transformations.py --checkpoint "$PIZERO_CHECKPOINT"
 python experiments/local_operator_replay.py --checkpoint "$PIZERO_CHECKPOINT"
 python experiments/singleton_fidelity.py --checkpoint "$PIZERO_CHECKPOINT"
 ```
