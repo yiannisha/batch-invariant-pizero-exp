@@ -13,9 +13,13 @@ classifiers = [
 dependencies = [
     "einops",
     "hydra-core",
+    "matplotlib",
     "numpy==1.26.4",
     "omegaconf",
+    "opencv-python",
+    "pandas",
     "safetensors",
+    "scipy",
     "torch==2.5.0",
     "transformers==4.47.1",
     "batch-invariant-ops",
@@ -34,7 +38,7 @@ build-backend = "setuptools.build_meta"
 exclude = []
 
 [tool.uv.sources]
-batch-invariant-ops = { path = "batch_invariant_ops" }
+batch-invariant-ops = { path = "../../batch_invariant_ops" }
 
 [tool.ruff]
 line-length = 88

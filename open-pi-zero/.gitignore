@@ -3,7 +3,10 @@ temp/
 .ruff_cache/
 launch/
 logs/
-results/
+# Raw measurements and summaries are experiment deliverables.  Large replay
+# tensors and external checkpoints stay outside git.
+results/replay/tensors/
+checkpoints/
 wandb/
 *.mp4
 

@@ -1,6 +1,7 @@
 import torch
 from torch import nn
 
+from src.model.attention import attention_matmul
 from src.model.lora import get_layer
 
 
@@ -56,7 +57,9 @@ class GemmaRotaryEmbedding(nn.Module):
         position_ids_expanded = position_ids[:, None, :].float()
         # Multiply each theta by the position (which is the argument of the sin and cos functions)
         # freqs: [Batch_Size, Head_Dim // 2, 1] @ [Batch_Size, 1, Seq_Len] --> [Batch_Size, Seq_Len, Head_Dim // 2]
-        freqs = (inv_freq_expanded.float() @ position_ids_expanded.float()).transpose(
+        freqs = attention_matmul(
+            inv_freq_expanded.float(), position_ids_expanded.float()
+        ).transpose(
             1, 2
         )
         # emb: [Batch_Size, Seq_Len, Head_Dim]

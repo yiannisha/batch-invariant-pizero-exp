@@ -5,6 +5,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from src.model.lora import get_layer
+from src.model.attention import attention_matmul
 from src.utils.trace import GLOBAL_TRACE
 
 class PaliGemmaMultiModalProjector(nn.Module):
@@ -88,12 +89,16 @@ class SiglipVisionEmbeddings(nn.Module):
         self.image_size = config.image_size
         self.patch_size = config.patch_size
 
-        self.patch_embedding = _UnfoldConv2d(
-            c_in=config.num_channels,
-            c_out=self.embed_dim,
+        # Keep the source model's native convolution here.  Experimental
+        # configurations replace aten::convolution at dispatch time; baking a
+        # per-sample reference into the model would make the native baseline
+        # impossible to measure.
+        self.patch_embedding = nn.Conv2d(
+            in_channels=config.num_channels,
+            out_channels=self.embed_dim,
             kernel_size=self.patch_size,
             stride=self.patch_size,
-            padding=0,  # This indicates no padding is added
+            padding="valid",
         )
 
         self.num_patches = (self.image_size // self.patch_size) ** 2
@@ -188,9 +193,9 @@ class SiglipAttention(nn.Module):
             batch_size, seq_len, self.num_heads, self.head_dim
         ).transpose(1, 2)
         # Calculate the attention using the formula Q * K^T / sqrt(d_k). attn_weights: [Batch_Size, Num_Heads, Num_Patches, Num_Patches]
-        attn_weights = (
-            torch.matmul(query_states, key_states.transpose(2, 3)) * self.scale
-        )
+        attn_weights = attention_matmul(
+            query_states, key_states.transpose(2, 3)
+        ) * self.scale
 
         if attn_weights.size() != (batch_size, self.num_heads, seq_len, seq_len):
             raise ValueError(
@@ -207,7 +212,7 @@ class SiglipAttention(nn.Module):
             attn_weights, p=self.dropout, training=self.training
         )
         # Multiply the attention weights by the value states. attn_output: [Batch_Size, Num_Heads, Num_Patches, Head_Dim]
-        attn_output = torch.matmul(attn_weights, value_states)
+        attn_output = attention_matmul(attn_weights, value_states)
 
         if attn_output.size() != (batch_size, self.num_heads, seq_len, self.head_dim):
             raise ValueError(

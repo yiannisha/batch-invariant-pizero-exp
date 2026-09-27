@@ -22,7 +22,7 @@ from src.model.vla.modules import (
 )
 from src.utils.decorator import NoSyncBase
 from src.utils.monitor import log_execution_time
-from src.utils.trace import GLOBAL_TRACE
+from src.utils.trace import GLOBAL_TRACE, trace_scope
 
 log = logging.getLogger(__name__)
 
@@ -362,19 +362,20 @@ class PiZero(nn.Module, NoSyncBase):
 
         # forward pass thru the vlm and proprio, cache the kv
         # TODO: check this -> uses RMSNorm which is not batch invariant, and there are no OSS thinky operators for it
-        _, kv_caches = self.joint_model(
-            attention_mask=image_text_proprio_mask,
-            position_ids_all={
-                "vlm": vlm_position_ids,
-                "proprio": proprio_position_ids,
-            },
-            embeds_all={
-                "vlm": inputs_embeds,
-                "proprio": proprio_embeds,
-            },
-            kv_caches=kv_caches,
-            return_caches=True,
-        )
+        with trace_scope("prefill"):
+            _, kv_caches = self.joint_model(
+                attention_mask=image_text_proprio_mask,
+                position_ids_all={
+                    "vlm": vlm_position_ids,
+                    "proprio": proprio_position_ids,
+                },
+                embeds_all={
+                    "vlm": inputs_embeds,
+                    "proprio": proprio_embeds,
+                },
+                kv_caches=kv_caches,
+                return_caches=True,
+            )
         GLOBAL_TRACE.record(
             "prefill_kv_caches",
             {
@@ -407,6 +408,7 @@ class PiZero(nn.Module, NoSyncBase):
         delta_t = 1.0 / self.num_inference_steps
         t = torch.zeros(bsz, device=device, dtype=dtype)
         for step in range(self.num_inference_steps):
+            GLOBAL_TRACE.record(f"flow.step_{step}.action_state", action)
             # encode action and time into embedding
             time_cond = self.time_embedding(t)
             GLOBAL_TRACE.record(f"step_{step}.time_cond", time_cond)
@@ -420,31 +422,35 @@ class PiZero(nn.Module, NoSyncBase):
             GLOBAL_TRACE.record(f"step_{step}.action_encoder", action_embeds)
             # [Batch_Size, Horizon_Steps, Embed_Dim]
             # TODO: check this
-            action_embeds = self.joint_model(
-                attention_mask=action_mask,
-                position_ids_all={"action": action_position_ids},
-                embeds_all={"action": action_embeds},
-                time_cond=time_cond,
-                kv_caches=kv_caches,
-                cache_mode="append_non_active",  # use caches from other mixtures, i.e., vlm and proprio
-            )["action"]
+            with trace_scope(f"flow_step_{step}"):
+                action_embeds = self.joint_model(
+                    attention_mask=action_mask,
+                    position_ids_all={"action": action_position_ids},
+                    embeds_all={"action": action_embeds},
+                    time_cond=time_cond,
+                    kv_caches=kv_caches,
+                    cache_mode="append_non_active",  # use caches from other mixtures, i.e., vlm and proprio
+                )["action"]
             GLOBAL_TRACE.record(f"step_{step}.action_joint_model", action_embeds)
             # decode action: [Batch_Size, Horizon_Steps, Action_Dim]
             # TODO: check this
             action_vel = self.action_decoder(action_embeds)
             GLOBAL_TRACE.record(f"step_{step}.action_decoder", action_vel)
+            GLOBAL_TRACE.record(f"flow.step_{step}.predicted_velocity", action_vel)
             action += delta_t * action_vel
             GLOBAL_TRACE.record(f"step_{step}.updated_action", action)
+            GLOBAL_TRACE.record(f"flow.step_{step}.updated_action_state", action)
             t += delta_t
 
         # clamp final output if specified
+        GLOBAL_TRACE.record("final_action.pre_clip", action)
         if self.final_action_clip_value is not None:
             action = torch.clamp(
                 action,
                 -self.final_action_clip_value,
                 self.final_action_clip_value,
             )
-        GLOBAL_TRACE.record("final_action", action)
+        GLOBAL_TRACE.record("final_action.returned", action)
         return action
 
     def infer_action_naive(

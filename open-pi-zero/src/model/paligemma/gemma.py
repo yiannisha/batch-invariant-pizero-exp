@@ -4,6 +4,7 @@ from typing import Optional, Tuple
 import torch
 from torch import nn
 
+from src.model.attention import attention_matmul
 from src.model.kv_cache import KVCache
 from src.model.lora import get_layer
 from src.model.paligemma.modules import GemmaMLP, GemmaRMSNorm, GemmaRotaryEmbedding
@@ -103,7 +104,7 @@ class GemmaAttention(nn.Module):
         key_states = repeat_kv(key_states, self.num_key_value_groups)
         value_states = repeat_kv(value_states, self.num_key_value_groups)
         # Perform the calculation as usual, Q * K^T / sqrt(head_dim). Shape: [Batch_Size, Num_Heads_Q, Seq_Len_Q, Seq_Len_KV]
-        attn_weights = torch.matmul(
+        attn_weights = attention_matmul(
             query_states, key_states.transpose(2, 3)
         ) / math.sqrt(self.head_dim)
 
@@ -119,7 +120,7 @@ class GemmaAttention(nn.Module):
             attn_weights, p=self.attention_dropout, training=self.training
         )
         # Multiply by the values. [Batch_Size, Num_Heads_Q, Seq_Len_Q, Seq_Len_KV] x [Batch_Size, Num_Heads_KV, Seq_Len_KV, Head_Dim] -> [Batch_Size, Num_Heads_Q, Seq_Len_Q, Head_Dim]
-        attn_output = torch.matmul(attn_weights, value_states)
+        attn_output = attention_matmul(attn_weights, value_states)
 
         if attn_output.size() != (bsz, self.num_heads, q_len, self.head_dim):
             raise ValueError(

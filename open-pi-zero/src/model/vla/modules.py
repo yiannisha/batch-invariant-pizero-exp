@@ -5,6 +5,7 @@ import torch
 import torch.nn as nn
 from einops import rearrange
 
+from src.model.attention import attention_matmul
 
 class SinusoidalPosEmb(nn.Module):
     def __init__(self, dim: int, max_period: float = 10000.0):
@@ -71,7 +72,9 @@ class GaussianFourierFeatureTransform(torch.nn.Module):
         self.pi = 3.14159265359
 
     def forward(self, v: torch.FloatTensor) -> torch.FloatTensor:
-        x_proj = torch.matmul(2 * self.pi * v, self.b.to(v.device).to(v.dtype))
+        x_proj = attention_matmul(
+            2 * self.pi * v, self.b.to(v.device).to(v.dtype)
+        )
         return torch.cat([torch.sin(x_proj), torch.cos(x_proj)], -1)
 
 

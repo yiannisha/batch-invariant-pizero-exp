@@ -19,6 +19,7 @@ from omegaconf import OmegaConf
 
 from src.utils.trace import GLOBAL_TRACE
 
+from src.model.attention import attention_matmul
 from src.model.kv_cache import KVCache
 from src.model.vla.mixture import Mixture
 
@@ -133,15 +134,6 @@ def forward_mixture_layers(
     GLOBAL_TRACE.record(f"step_0.action_joint_model.layer_{layer_idx}.final", hidden_states_final)
 
     return hidden_states_final
-
-def loop_bmm(a, b):
-    return torch.stack(
-        [
-            torch.stack(
-                [torch.mm(a[i][j], b[i][j]) for j in range(a.shape[1])]
-            ) for i in range(a.shape[0])
-        ]
-    )
 
 def forward_mixture_attn(
     mixtures: nn.ModuleDict,
@@ -281,7 +273,7 @@ def forward_mixture_attn(
 
     # Perform the calculation as usual, Q * K^T / sqrt(head_dim)
     # [Batch_Size, Num_Heads_Q, Full_Seq_Len, Full_Seq_Len]
-    attn_weights = torch.matmul(query_states, key_states.transpose(2, 3)) / math.sqrt(
+    attn_weights = attention_matmul(query_states, key_states.transpose(2, 3)) / math.sqrt(
         mixtures[active_mixture_names[0]].head_dim
     )
 
@@ -307,10 +299,7 @@ def forward_mixture_attn(
     GLOBAL_TRACE.record(f"step_0.action_joint_model.layer_{layer_idx}.pre_attn.attn_weights_dropout", attn_weights)
 
     # Multiply by the values. [Batch_Size, Num_Heads_Q, Full_Seq_Len, Full_Seq_Len] x [Batch_Size, Num_Heads_KV, Full_Seq_Len, Head_Dim] -> [Batch_Size, Num_Heads_Q, Full_Seq_Len, Head_Dim]
-    # attn_output = torch.matmul(attn_weights, value_states)
-    print("attn_weights shape:", attn_weights.shape)
-    print("value_states shape:", value_states.shape)
-    attn_output = loop_bmm(attn_weights, value_states)
+    attn_output = attention_matmul(attn_weights, value_states)
     GLOBAL_TRACE.record(f"step_0.action_joint_model.layer_{layer_idx}.pre_attn.attn_output_pre", attn_output)
 
     # Make sure the sequence length is the second dimension. # [Batch_Size, Num_Heads_Q, Full_Seq_Len, Head_Dim] -> [Batch_Size, Full_Seq_Len, Num_Heads_Q, Head_Dim]
