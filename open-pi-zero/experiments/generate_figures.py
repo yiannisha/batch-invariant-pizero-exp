@@ -59,7 +59,7 @@ def serving_figure(summary_path: Path, output: Path) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--trace", type=Path, default=Path("results/diagnostic/pretrained_first_divergence.json"))
+    parser.add_argument("--trace", type=Path, default=Path("results/diagnostic/first_divergence.json"))
     parser.add_argument("--serving", type=Path, default=Path("results/serving/summary.json"))
     parser.add_argument("--output-dir", type=Path, default=Path("artifacts/figures"))
     args = parser.parse_args()
