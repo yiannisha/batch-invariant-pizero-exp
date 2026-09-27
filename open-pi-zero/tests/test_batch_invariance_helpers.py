@@ -1,5 +1,7 @@
 import torch
 
+from experiments.common import load_numerical_freeze
+from experiments.heldout_invariance import completed_fidelity_keys
 from src.model.paligemma.siglip import _UnfoldConv2d
 from src.model.attention import attention_implementation, attention_matmul
 from src.utils.trace import trace_context
@@ -65,3 +67,35 @@ def test_per_matrix_attention_matches_native():
     with attention_implementation("per_matrix"):
         actual = attention_matmul(left, right)
     torch.testing.assert_close(actual, expected)
+
+
+def test_completed_fidelity_keys_supports_resume(tmp_path):
+    path = tmp_path / "fidelity.jsonl"
+    path.write_text(
+        '{"request_id":"request-1"}\n{"request_id":"request-2"}\n'
+    )
+    assert completed_fidelity_keys(path) == {"request-1", "request-2"}
+    assert completed_fidelity_keys(tmp_path / "missing.jsonl") == set()
+
+
+def test_numerical_freeze_validates_checkpoint(tmp_path):
+    checkpoint = tmp_path / "checkpoint.pt"
+    checkpoint.write_bytes(b"checkpoint")
+    import hashlib
+    import json
+
+    freeze = tmp_path / "freeze.json"
+    freeze.write_text(
+        json.dumps(
+            {
+                "numerical_implementation_frozen": True,
+                "dirty_status": [],
+                "checkpoint": {
+                    "sha256": hashlib.sha256(b"checkpoint").hexdigest()
+                },
+            }
+        )
+    )
+    assert load_numerical_freeze(freeze, checkpoint)[
+        "numerical_implementation_frozen"
+    ]

@@ -11,6 +11,7 @@ import torch
 
 from experiments.common import (
     append_jsonl,
+    load_numerical_freeze,
     load_pretrained_policy,
     prepare_inputs,
     run_policy,
@@ -30,10 +31,14 @@ CONDITIONS = {
 
 
 def indexed_noise(task: str, initialization: int, policy_call: int) -> torch.Tensor:
-    key = f"{task}/initialization-{initialization}/policy-call-{policy_call}"
+    key = noise_id(task, initialization, policy_call)
     seed = int.from_bytes(hashlib.sha256(key.encode()).digest()[:8], "little")
     generator = torch.Generator().manual_seed(seed)
     return torch.randn(1, 4, 7, generator=generator)
+
+
+def noise_id(task: str, initialization: int, policy_call: int) -> str:
+    return f"{task}/initialization-{initialization}/policy-call-{policy_call}"
 
 
 def completed(path: Path) -> set[tuple[str, int, str]]:
@@ -53,6 +58,7 @@ def main() -> None:
     parser.add_argument("--tokenizer", type=Path, required=True)
     parser.add_argument("--replay-manifest", type=Path, required=True)
     parser.add_argument("--config", type=Path, default=Path("config/fractal_beta.yaml"))
+    parser.add_argument("--freeze", type=Path, default=Path("results/numerical_freeze.json"))
     parser.add_argument("--statistics", type=Path, default=Path("config/fractal_statistics.json"))
     parser.add_argument("--output", type=Path, default=Path("results/simpler/episodes.jsonl"))
     parser.add_argument("--initializations", type=int, default=50)
@@ -63,11 +69,29 @@ def main() -> None:
         raise FileExistsError(f"refusing to overwrite {args.output}; use --resume")
     import simpler_env
 
+    freeze = load_numerical_freeze(args.freeze, args.checkpoint)
     model, config = load_pretrained_policy(
         args.checkpoint, config_path=args.config, dtype=torch.float32
     )
     adapter = FractalSimplerAdapter(args.tokenizer, args.statistics)
     replay = json.loads(args.replay_manifest.read_text())
+    replay_provenance = replay.get("provenance", {})
+    if replay_provenance.get("numerical_policy_sha") != freeze["batch_invariant_pizero_sha"]:
+        raise RuntimeError("replay manifest and numerical freeze revisions differ")
+    if replay_provenance.get("checkpoint_sha256") != freeze["checkpoint"]["sha256"]:
+        raise RuntimeError("replay manifest and frozen checkpoint differ")
+    if args.output.exists():
+        with args.output.open() as stream:
+            revisions = {
+                record.get("numerical_policy_sha")
+                for line in stream
+                if line.strip() and (record := json.loads(line))
+            }
+        if revisions != {freeze["batch_invariant_pizero_sha"]}:
+            raise RuntimeError(
+                f"refusing to combine SIMPLER revisions: existing={revisions}, "
+                f"frozen={freeze['batch_invariant_pizero_sha']}"
+            )
     companion_observations = replay["observations"]
     already_done = completed(args.output)
 
@@ -104,6 +128,7 @@ def main() -> None:
                     batch_size = (1, 2, 4, 8)[policy_call % 4] if dynamic else 1
                     target_position = policy_call % batch_size
                     requests = []
+                    companion_request_ids = []
                     for companion_index in range(batch_size - 1):
                         replay_observation = companion_observations[
                             (initialization_id * 97 + policy_call * 11 + companion_index)
@@ -115,6 +140,9 @@ def main() -> None:
                                 policy_call % 3,
                                 torch.float32,
                             )
+                        )
+                        companion_request_ids.append(
+                            replay_observation["request_ids"][policy_call % 3]
                         )
                     requests.insert(target_position, target)
                     inputs = prepare_inputs(model, concatenate(requests), torch.float32)
@@ -133,6 +161,10 @@ def main() -> None:
                                 "action_index": action_index,
                                 "batch_size": batch_size,
                                 "target_position": target_position,
+                                "noise_id": noise_id(
+                                    task, initialization_id, policy_call
+                                ),
+                                "companion_request_ids": companion_request_ids,
                                 "normalized_action": normalized_actions[action_index].tolist(),
                                 "environment_action": environment_action.tolist(),
                                 "reward": float(reward),
@@ -151,9 +183,13 @@ def main() -> None:
                         {
                             "schema_version": 1,
                             "timestamp": utc_timestamp(),
+                            "numerical_policy_sha": freeze["batch_invariant_pizero_sha"],
+                            "batch_invariant_ops_sha": freeze["batch_invariant_ops_sha"],
+                            "checkpoint_sha256": freeze["checkpoint"]["sha256"],
                             "task": task,
                             "environment": environment_name,
                             "initialization_id": initialization_id,
+                            "initialization_seed": args.seed + initialization_id,
                             "condition": condition,
                             "implementation": implementation,
                             "dynamic_batching": dynamic,
@@ -163,6 +199,8 @@ def main() -> None:
                             "policy_call_count": policy_call,
                             "action_sequence": actions_record,
                             "trajectory": trajectory,
+                            "dynamic_batch_cycle": [1, 2, 4, 8] if dynamic else [1],
+                            "policy_noise_scheme": "sha256-indexed-by-task-initialization-policy-call",
                         }
                     ],
                 )

@@ -9,11 +9,15 @@ import numpy as np
 import torch
 
 from experiments.common import (
+    PROJECT_ROOT,
+    git_sha,
     index_inputs,
     load_pretrained_policy,
+    load_numerical_freeze,
     prepare_inputs,
     run_policy,
     seed_everything,
+    sha256_file,
     utc_timestamp,
     write_json,
 )
@@ -52,6 +56,7 @@ def main() -> None:
     parser.add_argument("--checkpoint", type=Path, required=True)
     parser.add_argument("--tokenizer", type=Path, required=True)
     parser.add_argument("--config", type=Path, default=Path("config/fractal_beta.yaml"))
+    parser.add_argument("--freeze", type=Path, default=Path("results/numerical_freeze.json"))
     parser.add_argument("--statistics", type=Path, default=Path("config/fractal_statistics.json"))
     parser.add_argument("--dataset-root", type=Path, required=True)
     parser.add_argument("--manifest", type=Path, default=Path("results/replay_manifest.json"))
@@ -64,16 +69,19 @@ def main() -> None:
     import simpler_env
 
     seed_everything(args.seed)
+    freeze = load_numerical_freeze(args.freeze, args.checkpoint)
     model, config = load_pretrained_policy(
         args.checkpoint, config_path=args.config, dtype=torch.float32
     )
     adapter = FractalSimplerAdapter(args.tokenizer, args.statistics)
     records = []
     episodes = []
-    for task_name, environment_name in TASKS.items():
+    for task_index, (task_name, environment_name) in enumerate(TASKS.items()):
         env = simpler_env.make(environment_name)
         for episode_index in range(args.episodes_per_task):
+            reset_seed = args.seed + task_index * 10_000 + episode_index
             observation, reset_info = env.reset(
+                seed=reset_seed,
                 options={"obj_init_options": {"episode_id": episode_index}}
             )
             adapter.reset()
@@ -150,6 +158,7 @@ def main() -> None:
                 {
                     "task": task_name,
                     "episode_id": episode_index,
+                    "reset_seed": reset_seed,
                     "success": bool(success),
                     "terminal_info": str(terminal_info),
                     "reset_info": str(reset_info),
@@ -162,6 +171,15 @@ def main() -> None:
         "schema_version": 1,
         "created_at": utc_timestamp(),
         "seed": args.seed,
+        "provenance": {
+            "batch_invariant_pizero_sha": git_sha(PROJECT_ROOT.parent),
+            "numerical_policy_sha": freeze["batch_invariant_pizero_sha"],
+            "batch_invariant_ops_sha": freeze["batch_invariant_ops_sha"],
+            "checkpoint_path": str(args.checkpoint.resolve()),
+            "checkpoint_sha256": freeze["checkpoint"]["sha256"],
+            "tokenizer_path": str(args.tokenizer.resolve()),
+            "statistics_path": str(args.statistics.resolve()),
+        },
         "episodes_per_task": args.episodes_per_task,
         "observations_per_episode": args.observations_per_episode,
         "noise_tensors_per_observation": 3,

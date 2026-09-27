@@ -110,6 +110,22 @@ def sha256_file(path: Path, chunk_size: int = 16 * 1024 * 1024) -> str:
     return digest.hexdigest()
 
 
+def load_numerical_freeze(path: Path | str, checkpoint: Path | str) -> dict:
+    path = Path(path)
+    checkpoint = Path(checkpoint)
+    record = json.loads(path.read_text())
+    if not record.get("numerical_implementation_frozen") or record.get("dirty_status"):
+        raise RuntimeError(f"{path} is not a valid clean numerical freeze")
+    actual_checkpoint_hash = sha256_file(checkpoint)
+    expected_checkpoint_hash = record.get("checkpoint", {}).get("sha256")
+    if actual_checkpoint_hash != expected_checkpoint_hash:
+        raise RuntimeError(
+            "checkpoint does not match numerical freeze: "
+            f"expected {expected_checkpoint_hash}, observed {actual_checkpoint_hash}"
+        )
+    return record
+
+
 def seed_everything(seed: int) -> None:
     random.seed(seed)
     np.random.seed(seed)

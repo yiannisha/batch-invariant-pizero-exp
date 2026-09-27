@@ -14,6 +14,7 @@ from experiments.common import (
     append_jsonl,
     compare_traces,
     flatten_tensors,
+    load_numerical_freeze,
     load_pretrained_policy,
     prepare_inputs,
     run_policy,
@@ -125,11 +126,23 @@ def completed_keys(path: Path) -> set[tuple]:
     return keys
 
 
+def completed_fidelity_keys(path: Path) -> set[str]:
+    if not path.exists():
+        return set()
+    with path.open() as stream:
+        return {
+            record["request_id"]
+            for line in stream
+            if line.strip() and (record := json.loads(line))
+        }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--checkpoint", type=Path, required=True)
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--config", type=Path, default=Path("config/fractal_beta.yaml"))
+    parser.add_argument("--freeze", type=Path, default=Path("results/numerical_freeze.json"))
     parser.add_argument("--statistics", type=Path, default=Path("config/fractal_statistics.json"))
     parser.add_argument("--output", type=Path, default=Path("results/heldout/invariance.jsonl"))
     parser.add_argument("--fidelity-output", type=Path, default=Path("results/heldout/singleton_fidelity.jsonl"))
@@ -142,6 +155,19 @@ def main() -> None:
     args = parser.parse_args()
     if args.output.exists() and not args.resume:
         raise FileExistsError(f"refusing to overwrite {args.output}; use --resume")
+    freeze = load_numerical_freeze(args.freeze, args.checkpoint)
+    if args.output.exists():
+        with args.output.open() as stream:
+            revisions = {
+                record.get("numerical_policy_sha")
+                for line in stream
+                if line.strip() and (record := json.loads(line))
+            }
+        if revisions != {freeze["batch_invariant_pizero_sha"]}:
+            raise RuntimeError(
+                f"refusing to combine held-out revisions: existing={revisions}, "
+                f"frozen={freeze['batch_invariant_pizero_sha']}"
+            )
     manifest = json.loads(args.manifest.read_text())
     statistics = json.loads(args.statistics.read_text())
     observations = [item for item in manifest["observations"] if item["split"] == args.split]
@@ -150,6 +176,7 @@ def main() -> None:
     dtype = getattr(torch, args.dtype)
     model, _ = load_pretrained_policy(args.checkpoint, config_path=args.config, dtype=dtype)
     done = completed_keys(args.output)
+    fidelity_done = completed_fidelity_keys(args.fidelity_output)
     all_observations = manifest["observations"]
 
     for observation_index, observation in enumerate(observations):
@@ -161,6 +188,15 @@ def main() -> None:
             target_raw = raw_request(observation, noise_id, dtype)
             companions_raw = [raw_request(item, noise_id, dtype) for item in companion_observations]
             request_id = observation["request_ids"][noise_id]
+            request_ids_by_object = {id(target_raw): request_id}
+            request_ids_by_object.update(
+                {
+                    id(raw): item["request_ids"][noise_id]
+                    for raw, item in zip(
+                        companions_raw, companion_observations, strict=True
+                    )
+                }
+            )
             singleton_outputs = {}
             singleton_traces = {}
             for implementation in args.implementations:
@@ -198,6 +234,9 @@ def main() -> None:
                         "experiment_id": str(uuid.uuid4()),
                         "timestamp": utc_timestamp(),
                         "request_id": request_id,
+                        "numerical_policy_sha": freeze["batch_invariant_pizero_sha"],
+                        "batch_invariant_ops_sha": freeze["batch_invariant_ops_sha"],
+                        "checkpoint_sha256": freeze["checkpoint"]["sha256"],
                         "task": observation["task"],
                         "episode_id": observation["episode_id"],
                         "observation_index": observation["observation_index"],
@@ -210,7 +249,11 @@ def main() -> None:
                         "batch_size": len(requests),
                         "target_batch_position": position_name,
                         "companion_type": companion_type,
-                        "companion_ids": [item.get("request_ids", ["target"])[noise_id] if "request_ids" in item else "target" for item in ([observation] if requests[0] is target_raw else companion_observations[:1])],
+                        "companion_ids": [
+                            request_ids_by_object[id(request)]
+                            for position, request in enumerate(requests)
+                            if position != target_position
+                        ],
                         "request_ordering": ordering,
                         "partition_id": transformation if transformation == "partition" else "single_batch",
                         "latency_seconds": elapsed,
@@ -227,7 +270,10 @@ def main() -> None:
                     append_jsonl(args.output, [record])
                     done.add(key)
 
-            if {"native", "full_invariant"}.issubset(singleton_outputs):
+            if (
+                {"native", "full_invariant"}.issubset(singleton_outputs)
+                and request_id not in fidelity_done
+            ):
                 append_jsonl(
                     args.fidelity_output,
                     [
@@ -235,6 +281,9 @@ def main() -> None:
                             "schema_version": 1,
                             "timestamp": utc_timestamp(),
                             "request_id": request_id,
+                            "numerical_policy_sha": freeze["batch_invariant_pizero_sha"],
+                            "batch_invariant_ops_sha": freeze["batch_invariant_ops_sha"],
+                            "checkpoint_sha256": freeze["checkpoint"]["sha256"],
                             "task": observation["task"],
                             "episode_id": observation["episode_id"],
                             "observation_index": observation["observation_index"],
@@ -251,6 +300,7 @@ def main() -> None:
                         }
                     ],
                 )
+                fidelity_done.add(request_id)
     print(args.output)
 
 
