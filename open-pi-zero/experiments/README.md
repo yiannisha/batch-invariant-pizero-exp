@@ -144,3 +144,24 @@ Raw JSONL is authoritative; tables and figures are regenerated from it.
 successful complete campaign writes `results/audit.json` with status
 `complete_campaign_verified`; do not infer completion solely from a process
 exit or the presence of generated figures.
+
+## Lossless archival of large JSONL results
+
+The exhaustive held-out JSONL is larger than ordinary hosted-Git blob limits.
+Keep the uncompressed JSONL as the local authoritative input to analysis, and
+create deterministic, lossless gzip copies for result commits only after all
+writers and the final audit have finished:
+
+```console
+python experiments/package_jsonl.py \
+  results/heldout/invariance.jsonl \
+  results/heldout/singleton_fidelity.jsonl \
+  results/simpler/episodes.jsonl
+python experiments/package_jsonl.py \
+  --manifest results/archive_manifest.json --verify-only
+```
+
+`results/archive_manifest.json` records raw and compressed sizes, line counts,
+and SHA-256 hashes.  Verification streams the gzip payload and requires its
+decompressed identity to match the raw record.  Gzip timestamps are fixed at
+zero so repeated packaging of identical data is byte-identical.
