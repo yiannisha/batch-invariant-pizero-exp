@@ -5,6 +5,7 @@ import json
 import math
 from collections import defaultdict
 from pathlib import Path
+from uuid import UUID
 
 from experiments.common import sha256_file, utc_timestamp, write_json
 
@@ -240,6 +241,46 @@ def simpler_audit(
         and item["checkpoint_sha256"] == freeze["checkpoint"]["sha256"]
         for item in episodes
     )
+    assert all(
+        item["schema_version"] == 1
+        and str(UUID(item["experiment_id"])) == item["experiment_id"]
+        and item["request_id"]
+        == (
+            f"{item['task']}/initialization-{item['initialization_id']:03d}/"
+            f"condition-{item['condition']}"
+        )
+        and item["episode_id"] == item["initialization_id"]
+        and item["dtype"] == "float32"
+        and item["tf32"] is False
+        and item["cudnn_tf32"] is True
+        and item["execution_mode"] == "eager"
+        and item["action_sequence"]
+        and len(item["trajectory"]) == len(item["action_sequence"]) + 1
+        for item in episodes
+    )
+    for episode in episodes:
+        calls = {item["policy_call"] for item in episode["action_sequence"]}
+        assert calls == set(range(episode["policy_call_count"]))
+        for action in episode["action_sequence"]:
+            expected_batch_size = (
+                (1, 2, 4, 8)[action["policy_call"] % 4]
+                if episode["dynamic_batching"] else 1
+            )
+            assert action["batch_size"] == expected_batch_size
+            assert action["target_position"] == action["policy_call"] % expected_batch_size
+            expected_noise_id = (
+                f"{episode['task']}/initialization-{episode['initialization_id']}/"
+                f"policy-call-{action['policy_call']}"
+            )
+            assert action["noise_id"] == expected_noise_id
+            assert len(action["companion_request_ids"]) == expected_batch_size - 1
+            assert len(action["request_ordering"]) == expected_batch_size
+            assert action["request_ordering"][action["target_position"]] == expected_noise_id
+            assert len(action["normalized_action"]) == 7
+            assert len(action["environment_action"]) == 7
+            assert math.isfinite(action["reward"])
+            assert all(math.isfinite(value) for value in action["normalized_action"])
+            assert all(math.isfinite(value) for value in action["environment_action"])
     assert all(
         (
             item["implementation"],

@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import uuid
 
 import numpy as np
 import torch
@@ -235,6 +236,9 @@ def main() -> None:
                             task, initialization_id, policy_call
                         ),
                     }
+                    target_noise_id = noise_id(
+                        task, initialization_id, policy_call
+                    )
                     batch_size = (1, 2, 4, 8)[policy_call % 4] if dynamic else 1
                     target_position = policy_call % batch_size
                     requests = []
@@ -255,6 +259,8 @@ def main() -> None:
                             replay_observation["request_ids"][policy_call % 3]
                         )
                     requests.insert(target_position, target)
+                    request_ordering = list(companion_request_ids)
+                    request_ordering.insert(target_position, target_noise_id)
                     inputs = prepare_inputs(model, concatenate(requests), torch.float32)
                     output, _, _, _ = run_policy(model, inputs, implementation)
                     normalized_actions = output[target_position].numpy()
@@ -271,10 +277,9 @@ def main() -> None:
                                 "action_index": action_index,
                                 "batch_size": batch_size,
                                 "target_position": target_position,
-                                "noise_id": noise_id(
-                                    task, initialization_id, policy_call
-                                ),
+                                "noise_id": target_noise_id,
                                 "companion_request_ids": companion_request_ids,
+                                "request_ordering": request_ordering,
                                 "normalized_action": normalized_actions[action_index].tolist(),
                                 "environment_action": environment_action.tolist(),
                                 "reward": float(reward),
@@ -292,10 +297,16 @@ def main() -> None:
                     [
                         {
                             "schema_version": 1,
+                            "experiment_id": str(uuid.uuid4()),
                             "timestamp": utc_timestamp(),
                             "numerical_policy_sha": freeze["batch_invariant_pizero_sha"],
                             "batch_invariant_ops_sha": freeze["batch_invariant_ops_sha"],
                             "checkpoint_sha256": freeze["checkpoint"]["sha256"],
+                            "request_id": (
+                                f"{task}/initialization-{initialization_id:03d}/"
+                                f"condition-{condition}"
+                            ),
+                            "episode_id": initialization_id,
                             "task": task,
                             "environment": environment_name,
                             "initialization_id": initialization_id,
@@ -303,6 +314,10 @@ def main() -> None:
                             "condition": condition,
                             "implementation": implementation,
                             "dynamic_batching": dynamic,
+                            "dtype": "float32",
+                            "tf32": torch.backends.cuda.matmul.allow_tf32,
+                            "cudnn_tf32": torch.backends.cudnn.allow_tf32,
+                            "execution_mode": "eager",
                             "success": bool(success),
                             "termination_reason": str(terminal_info),
                             "reset_info": str(reset_info),
