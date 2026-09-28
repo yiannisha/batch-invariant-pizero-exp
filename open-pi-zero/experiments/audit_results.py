@@ -165,6 +165,48 @@ def flow_summary_audit(path: Path) -> dict:
     return summary
 
 
+def diagnostic_flow_summary_audit(path: Path, trace_path: Path) -> dict:
+    summary = json.loads(path.read_text())
+    traces = json.loads(trace_path.read_text())
+    expected_implementations = {
+        "native",
+        "existing_invariant_ops",
+        "invariant_plus_patch_projection",
+        "full_invariant",
+    }
+    assert set(summary["implementations"]) == expected_implementations
+    assert summary["scope"] == "single frozen B=2 diverse diagnostic arrangement"
+    assert summary["central_statistic"] == "mean absolute error across action-state elements"
+    assert summary["tail_statistic"] == "maximum absolute error across action-state elements"
+    for implementation, steps in summary["implementations"].items():
+        assert set(steps) == {str(step) for step in range(11)}
+        expected = {
+            "0": {
+                "exact": True,
+                "mean_absolute_error": 0.0,
+                "maximum_absolute_error": 0.0,
+            }
+        }
+        for item in traces[implementation]["comparisons"]:
+            if not item["trace_key"].startswith("flow.step_") \
+                    or ".updated_action_state" not in item["trace_key"]:
+                continue
+            step = str(int(item["trace_key"].split(".")[1].split("_")[1]) + 1)
+            expected[step] = {
+                "exact": item["exact"],
+                "mean_absolute_error": item["mean_absolute_error"],
+                "maximum_absolute_error": item["max_absolute_error"],
+            }
+        assert steps == expected
+    assert all(
+        item["exact"]
+        and item["mean_absolute_error"] == 0.0
+        and item["maximum_absolute_error"] == 0.0
+        for item in summary["implementations"]["full_invariant"].values()
+    )
+    return summary
+
+
 def simpler_audit(
     path: Path,
     summary_path: Path,
@@ -403,15 +445,21 @@ def main() -> None:
     flow_summary = flow_summary_audit(
         RESULTS / "heldout" / "flow_step_summary.json"
     )
+    diagnostic_flow_summary = diagnostic_flow_summary_audit(
+        RESULTS / "diagnostic" / "flow_step_summary.json",
+        RESULTS / "diagnostic" / "first_divergence.json",
+    )
     historical_blocker = json.loads((RESULTS / "simpler" / "blocker.json").read_text())
     for relative in (
         "artifacts/figures/flow_step_propagation.png",
+        "artifacts/figures/flow_step_propagation_heldout.png",
         "artifacts/figures/serving_tradeoff.png",
         "artifacts/tables/operator_projection.csv",
         "artifacts/tables/policy_ablation.csv",
         "artifacts/tables/policy_heldout.csv",
         "artifacts/tables/simpler.csv",
         "results/heldout/flow_step_summary.json",
+        "results/diagnostic/flow_step_summary.json",
         "results/simpler/summary.json",
         "results/EXPERIMENT_REPORT.md",
     ):
@@ -461,6 +509,13 @@ def main() -> None:
                     "exact_per_step": [item["exact"] for item in steps.values()],
                 }
                 for implementation, steps in flow_summary.items()
+            },
+            "diagnostic_flow_steps": {
+                "scope": diagnostic_flow_summary["scope"],
+                "implementations": sorted(
+                    diagnostic_flow_summary["implementations"]
+                ),
+                "steps_per_implementation": 11,
             },
         },
         "replay": replay["counts"],

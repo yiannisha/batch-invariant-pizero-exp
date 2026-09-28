@@ -12,30 +12,85 @@ import numpy as np
 
 
 FLOW_PATTERN = re.compile(r"flow\.step_(\d+)\.updated_action_state")
+FLOW_IMPLEMENTATIONS = (
+    "native",
+    "existing_invariant_ops",
+    "invariant_plus_patch_projection",
+    "full_invariant",
+)
+FLOW_LABELS = {
+    "native": "Native",
+    "existing_invariant_ops": "Existing invariant operators",
+    "invariant_plus_patch_projection": "Operators + patch projection",
+    "full_invariant": "Complete invariant path",
+}
+FLOW_MARKERS = {
+    "native": "o",
+    "existing_invariant_ops": "s",
+    "invariant_plus_patch_projection": "^",
+    "full_invariant": "D",
+}
 
 
-def flow_figure(trace_path: Path, output: Path) -> None:
+def flow_figure(trace_path: Path, output: Path, summary_path: Path) -> None:
     traces = json.loads(trace_path.read_text())
     fig, axis = plt.subplots(figsize=(6.4, 4.0))
-    for implementation, payload in traces.items():
-        points = {}
+    summary = {
+        "scope": "single frozen B=2 diverse diagnostic arrangement",
+        "central_statistic": "mean absolute error across action-state elements",
+        "tail_statistic": "maximum absolute error across action-state elements",
+        "implementations": {},
+    }
+    for implementation in FLOW_IMPLEMENTATIONS:
+        payload = traces[implementation]
+        points = {
+            0: {
+                "exact": True,
+                "mean_absolute_error": 0.0,
+                "maximum_absolute_error": 0.0,
+            }
+        }
         for item in payload["comparisons"]:
             match = FLOW_PATTERN.match(item["trace_key"])
             if match:
-                points[int(match.group(1)) + 1] = item["max_absolute_error"]
-        points[0] = 0.0
+                points[int(match.group(1)) + 1] = {
+                    "exact": item["exact"],
+                    "mean_absolute_error": item["mean_absolute_error"],
+                    "maximum_absolute_error": item["max_absolute_error"],
+                }
         if points:
             x = sorted(points)
-            axis.plot(x, [points[index] for index in x], marker="o", label=implementation)
+            mean_line = axis.plot(
+                x,
+                [points[index]["mean_absolute_error"] for index in x],
+                marker=FLOW_MARKERS[implementation],
+                linewidth=3.0 if implementation == "existing_invariant_ops" else 1.5,
+                markersize=7 if implementation == "existing_invariant_ops" else 5,
+                label=f"{FLOW_LABELS[implementation]} mean",
+            )[0]
+            axis.plot(
+                x,
+                [points[index]["maximum_absolute_error"] for index in x],
+                linestyle="--",
+                color=mean_line.get_color(),
+                linewidth=3.0 if implementation == "existing_invariant_ops" else 1.5,
+                label=f"{FLOW_LABELS[implementation]} maximum",
+            )
+            summary["implementations"][implementation] = {
+                str(index): points[index] for index in x
+            }
     axis.set_xlabel("Flow step")
-    axis.set_ylabel("Maximum absolute action-state error")
+    axis.set_ylabel("Absolute action-state error")
+    axis.set_title("Frozen B=2 diverse diagnostic arrangement")
     axis.set_xticks(range(11))
-    axis.legend()
+    axis.legend(fontsize=7, ncol=2)
     axis.grid(alpha=0.25)
     fig.tight_layout()
     output.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(output, dpi=200)
     plt.close(fig)
+    summary_path.parent.mkdir(parents=True, exist_ok=True)
+    summary_path.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
 
 
 def heldout_flow_figure(records_path: Path, output: Path, summary_path: Path) -> None:
@@ -77,6 +132,7 @@ def heldout_flow_figure(records_path: Path, output: Path, summary_path: Path) ->
         }
     axis.set_xlabel("Flow step")
     axis.set_ylabel("Maximum absolute action-state error")
+    axis.set_title("Held-out replay: all non-singleton arrangements")
     axis.set_xticks(range(1, 11))
     axis.legend(fontsize=8)
     axis.grid(alpha=0.25)
@@ -118,17 +174,26 @@ def main() -> None:
         type=Path,
         default=Path("results/heldout/flow_step_summary.json"),
     )
+    parser.add_argument(
+        "--diagnostic-flow-summary",
+        type=Path,
+        default=Path("results/diagnostic/flow_step_summary.json"),
+    )
     parser.add_argument("--serving", type=Path, default=Path("results/serving/summary.json"))
     parser.add_argument("--output-dir", type=Path, default=Path("artifacts/figures"))
     args = parser.parse_args()
+    if args.trace.exists():
+        flow_figure(
+            args.trace,
+            args.output_dir / "flow_step_propagation.png",
+            args.diagnostic_flow_summary,
+        )
     if args.heldout.exists():
         heldout_flow_figure(
             args.heldout,
-            args.output_dir / "flow_step_propagation.png",
+            args.output_dir / "flow_step_propagation_heldout.png",
             args.flow_summary,
         )
-    elif args.trace.exists():
-        flow_figure(args.trace, args.output_dir / "flow_step_propagation.png")
     if args.serving.exists():
         serving_figure(args.serving, args.output_dir / "serving_tradeoff.png")
     print(args.output_dir)

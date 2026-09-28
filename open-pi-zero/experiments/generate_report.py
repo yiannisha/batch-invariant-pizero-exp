@@ -235,6 +235,28 @@ def main() -> None:
                     f"median={fmt(values['median'])}, p95={fmt(values['p95'])}, "
                     f"maximum={fmt(values['maximum'])}."
                 )
+        if trace:
+            lines.append(
+                "The frozen B=2 diverse diagnostic trace supplies the causal intermediate "
+                "paths not run across the exhaustive held-out set (mean and maximum below "
+                "are over the 28 action-state elements at each step):"
+            )
+            for implementation in (
+                "native", "existing_invariant_ops",
+                "invariant_plus_patch_projection", "full_invariant",
+            ):
+                points = {}
+                for item in trace[implementation].get("comparisons", []):
+                    match = FLOW.match(item["trace_key"])
+                    if match:
+                        points[int(match.group(1)) + 1] = (
+                            item["mean_absolute_error"], item["max_absolute_error"]
+                        )
+                values = ", ".join(
+                    f"{step}:mean {fmt(error[0])}/max {fmt(error[1])}"
+                    for step, error in sorted(points.items())
+                )
+                lines.append(f"- `{implementation}` step:mean/max — {values}")
     elif trace:
         for implementation in (
             "native", "existing_invariant_ops", "invariant_plus_patch_projection", "full_invariant"
