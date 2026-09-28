@@ -365,6 +365,19 @@ def simpler_audit(
     assert runtime["graphics_runtime"]["VK_DRIVER_FILES"] == \
         runtime["execution"]["vulkan_icd"]
     assert runtime["graphics_runtime"]["VK_LOADER_LAYERS_DISABLE"] == "~implicit~"
+    capabilities = runtime["graphics_runtime"]["NVIDIA_DRIVER_CAPABILITIES"]
+    assert capabilities == "all" or "graphics" in capabilities.split(",")
+    vulkan_summary = runtime["graphics_runtime"]["vulkaninfo_summary"]
+    assert all(
+        value in vulkan_summary
+        for value in (
+            "apiVersion         = 1.4.329",
+            "driverInfo         = 595.91.07",
+            "deviceName         = NVIDIA RTX PRO 6000 Blackwell Server Edition",
+            "driverName         = NVIDIA",
+            "deviceUUID         = 63cbdbc3-ef09-5abb-8ec0-27c3d63f0b16",
+        )
+    )
     assert runtime["repositories"] == {
         "simpler_env_sha": "59ad9e1539042ed333fd8ebba1b0395f5662f0bd",
         "maniskill2_real2sim_sha": "91d154bfd864577f8d2e80f3fc2f8b4d9df9ae5c",

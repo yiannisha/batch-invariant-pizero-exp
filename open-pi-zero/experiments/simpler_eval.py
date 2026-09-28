@@ -108,6 +108,7 @@ def write_runtime_provenance(args, freeze: dict) -> Path:
             "NVIDIA_DRIVER_CAPABILITIES": os.environ.get(
                 "NVIDIA_DRIVER_CAPABILITIES"
             ),
+            "vulkaninfo_summary": run_text(["vulkaninfo", "--summary"]),
         },
         "source_sha256": source_hashes(),
         "repositories": {
