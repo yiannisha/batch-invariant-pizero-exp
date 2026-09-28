@@ -168,17 +168,21 @@ def main() -> None:
     parser.add_argument("--output-dir", type=Path, default=Path("artifacts/tables"))
     args = parser.parse_args()
     operators = operator_rows(read_jsonl(args.operator))
-    policy_source = read_jsonl(args.policy)
-    if not policy_source:
-        policy_source = read_jsonl(args.diagnostic_policy)
-        policy_source += read_jsonl(Path("results/diagnostic/policy_ablation_large_batches.jsonl"))
-        policy_source += read_jsonl(Path("results/diagnostic/policy_ablation_bfloat16.jsonl"))
-    policies = policy_rows(policy_source)
+    heldout_policies = policy_rows(read_jsonl(args.policy))
+    diagnostic_source = read_jsonl(args.diagnostic_policy)
+    diagnostic_source += read_jsonl(
+        Path("results/diagnostic/policy_ablation_large_batches.jsonl")
+    )
+    diagnostic_source += read_jsonl(
+        Path("results/diagnostic/policy_ablation_bfloat16.jsonl")
+    )
+    diagnostic_policies = policy_rows(diagnostic_source)
     simpler = simpler_rows(read_jsonl(args.simpler))
     args.output_dir.mkdir(parents=True, exist_ok=True)
     for name, rows in (
         ("operator_projection", operators),
-        ("policy_ablation", policies),
+        ("policy_heldout", heldout_policies),
+        ("policy_ablation", diagnostic_policies),
         ("simpler", simpler),
     ):
         write_csv(args.output_dir / f"{name}.csv", rows)

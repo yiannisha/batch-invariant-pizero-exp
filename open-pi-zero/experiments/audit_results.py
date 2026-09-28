@@ -84,6 +84,56 @@ def heldout_audit(path: Path, fidelity_path: Path, freeze: dict) -> dict:
     }
 
 
+def diagnostic_replay_audit(path: Path, fidelity_path: Path, freeze: dict) -> dict:
+    records = jsonl(path)
+    fidelity = jsonl(fidelity_path)
+    assert len(records) == 1_104, (path, len(records), 1_104)
+    assert len(fidelity) == 24, (fidelity_path, len(fidelity), 24)
+    assert {item["task"] for item in records} == {
+        "pick_can", "move_near", "open_drawer", "close_drawer",
+    }
+    groups = defaultdict(list)
+    by_implementation = defaultdict(list)
+    for item in records:
+        assert item["numerical_policy_sha"] == freeze["batch_invariant_pizero_sha"]
+        assert item["batch_invariant_ops_sha"] == freeze["batch_invariant_ops_sha"]
+        assert item["checkpoint_sha256"] == freeze["checkpoint"]["sha256"]
+        groups[(item["request_id"], item["implementation"])].append(item)
+        by_implementation[item["implementation"]].append(item)
+    assert len(groups) == 48
+    assert all(len(items) == 23 for items in groups.values())
+    assert all(item["output"]["exact"] for item in by_implementation["full_invariant"])
+    return {
+        "arrangement_records": len(records),
+        "fixed_request_noise_pairs": len(fidelity),
+        "tasks": sorted({item["task"] for item in records}),
+        "implementations": {
+            name: {
+                "arrangements": len(items),
+                "violations": sum(not item["output"]["exact"] for item in items),
+                "maximum_error": max(
+                    item["output"]["max_absolute_error"] for item in items
+                ),
+            }
+            for name, items in sorted(by_implementation.items())
+        },
+    }
+
+
+def flow_summary_audit(path: Path) -> dict:
+    summary = json.loads(path.read_text())
+    assert set(summary) == {"native", "full_invariant"}
+    for steps in summary.values():
+        assert set(steps) == {str(step) for step in range(1, 11)}
+        assert all(item["comparisons"] == 50_400 for item in steps.values())
+    assert all(
+        item["exact"] == item["comparisons"]
+        and item["maximum_absolute_error"] == 0.0
+        for item in summary["full_invariant"].values()
+    )
+    return summary
+
+
 def simpler_audit(path: Path, summary_path: Path, freeze: dict) -> dict:
     episodes = jsonl(path)
     assert len(episodes) == 800, (path, len(episodes), 800)
@@ -199,10 +249,18 @@ def main() -> None:
         RESULTS / "heldout" / "singleton_fidelity.jsonl",
         freeze,
     )
+    diagnostic_replay = diagnostic_replay_audit(
+        RESULTS / "diagnostic" / "simpler_invariance.jsonl",
+        RESULTS / "diagnostic" / "simpler_singleton_fidelity.jsonl",
+        freeze,
+    )
     simpler = simpler_audit(
         RESULTS / "simpler" / "episodes.jsonl",
         RESULTS / "simpler" / "summary.json",
         freeze,
+    )
+    flow_summary = flow_summary_audit(
+        RESULTS / "heldout" / "flow_step_summary.json"
     )
     historical_blocker = json.loads((RESULTS / "simpler" / "blocker.json").read_text())
     for relative in (
@@ -210,12 +268,21 @@ def main() -> None:
         "artifacts/figures/serving_tradeoff.png",
         "artifacts/tables/operator_projection.csv",
         "artifacts/tables/policy_ablation.csv",
+        "artifacts/tables/policy_heldout.csv",
         "artifacts/tables/simpler.csv",
         "results/heldout/flow_step_summary.json",
         "results/simpler/summary.json",
         "results/EXPERIMENT_REPORT.md",
     ):
         assert (ROOT / relative).stat().st_size > 0
+    assert len((ROOT / "artifacts/tables/operator_projection.csv").read_text().splitlines()) == 721
+    assert len((ROOT / "artifacts/tables/policy_ablation.csv").read_text().splitlines()) == 13
+    assert len((ROOT / "artifacts/tables/policy_heldout.csv").read_text().splitlines()) == 3
+    assert len((ROOT / "artifacts/tables/simpler.csv").read_text().splitlines()) == 5
+    report = (RESULTS / "EXPERIMENT_REPORT.md").read_text()
+    assert all(f"## {letter}." in report for letter in "ABCDEFGH")
+    assert "0/800 planned episodes were executed" not in report
+    assert "replay dataset could not be collected" not in report
 
     audit = {
         "schema_version": 1,
@@ -245,6 +312,15 @@ def main() -> None:
                 not item["output"]["exact"] for item in full_transformations
             ),
             "heldout": heldout,
+            "rtx_diagnostic": diagnostic_replay,
+            "heldout_flow_steps": {
+                implementation: {
+                    "steps": len(steps),
+                    "comparisons_per_step": next(iter(steps.values()))["comparisons"],
+                    "exact_per_step": [item["exact"] for item in steps.values()],
+                }
+                for implementation, steps in flow_summary.items()
+            },
         },
         "replay": replay["counts"],
         "simpler": simpler,
