@@ -281,6 +281,40 @@ def simpler_audit(
             assert math.isfinite(action["reward"])
             assert all(math.isfinite(value) for value in action["normalized_action"])
             assert all(math.isfinite(value) for value in action["environment_action"])
+    episodes_by_key = {
+        (item["task"], item["initialization_id"], item["condition"]): item
+        for item in episodes
+    }
+
+    def request_schedule(episode: dict) -> dict[int, tuple]:
+        schedule = {}
+        for action in episode["action_sequence"]:
+            schedule.setdefault(
+                action["policy_call"],
+                (
+                    action["batch_size"],
+                    action["target_position"],
+                    action["noise_id"],
+                    tuple(action["companion_request_ids"]),
+                    tuple(action["request_ordering"]),
+                ),
+            )
+        return schedule
+
+    for task in {item["task"] for item in episodes}:
+        for initialization_id in range(50):
+            for left_name, right_name in (
+                ("native_singleton", "patched_singleton"),
+                ("native_dynamic", "patched_dynamic"),
+            ):
+                left = request_schedule(
+                    episodes_by_key[(task, initialization_id, left_name)]
+                )
+                right = request_schedule(
+                    episodes_by_key[(task, initialization_id, right_name)]
+                )
+                for policy_call in set(left) & set(right):
+                    assert left[policy_call] == right[policy_call]
     assert all(
         (
             item["implementation"],
@@ -383,6 +417,7 @@ def simpler_audit(
         "episodes": len(episodes),
         "matched_initializations_per_task": 50,
         "conditions": 4,
+        "paired_request_schedules_verified": True,
         "bootstrap": summary["bootstrap"],
         "runtime_provenance": {
             "evaluation_harness_sha": runtime["evaluation_harness_sha"],
