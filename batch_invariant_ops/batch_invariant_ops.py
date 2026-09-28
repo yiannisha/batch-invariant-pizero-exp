@@ -227,6 +227,20 @@ def get_compute_units():
     return NUM_SMS
 
 
+def get_persistent_num_stages(device: torch.device | str) -> int:
+    """Select a launch pipeline that fits the target GPU's shared memory.
+
+    The three-stage launch used on H100 requires 133120 bytes for the FP32
+    128x128 tile.  Workstation Blackwell parts expose 101376 opt-in bytes per
+    block, where the same tile and reduction order fit with two stages.
+    Pipeline staging changes buffering only; it does not change the Triton
+    program's tile shape or arithmetic order.
+    """
+
+    properties = torch.cuda.get_device_properties(device)
+    return 3 if properties.shared_memory_per_block_optin >= 133120 else 2
+
+
 def matmul_persistent(a: torch.Tensor, b: torch.Tensor, bias: torch.Tensor | None = None):
     # Check constraints.
     assert a.shape[1] == b.shape[0], "Incompatible dimensions"
@@ -256,7 +270,7 @@ def matmul_persistent(a: torch.Tensor, b: torch.Tensor, bias: torch.Tensor | Non
             "BLOCK_SIZE_N": 128,
             "BLOCK_SIZE_K": 64,
             "GROUP_SIZE_M": 8,
-            "num_stages": 3,
+            "num_stages": get_persistent_num_stages(a.device),
             "num_warps": 8,
         },
         torch.float16: {
@@ -264,7 +278,7 @@ def matmul_persistent(a: torch.Tensor, b: torch.Tensor, bias: torch.Tensor | Non
             "BLOCK_SIZE_N": 256,
             "BLOCK_SIZE_K": 64,
             "GROUP_SIZE_M": 8,
-            "num_stages": 3,
+            "num_stages": get_persistent_num_stages(a.device),
             "num_warps": 8,
         },
         torch.float32: {
@@ -272,7 +286,7 @@ def matmul_persistent(a: torch.Tensor, b: torch.Tensor, bias: torch.Tensor | Non
             "BLOCK_SIZE_N": 128,
             "BLOCK_SIZE_K": 32,
             "GROUP_SIZE_M": 8,
-            "num_stages": 3,
+            "num_stages": get_persistent_num_stages(a.device),
             "num_warps": 8,
         },
     }
@@ -332,7 +346,7 @@ def bmm_persistent(a: torch.Tensor, b: torch.Tensor):
             "BLOCK_SIZE_N": 128,
             "BLOCK_SIZE_K": 64,
             "GROUP_SIZE_M": 8,
-            "num_stages": 3,
+            "num_stages": get_persistent_num_stages(a.device),
             "num_warps": 8,
         },
         torch.float16: {
@@ -340,7 +354,7 @@ def bmm_persistent(a: torch.Tensor, b: torch.Tensor):
             "BLOCK_SIZE_N": 256,
             "BLOCK_SIZE_K": 64,
             "GROUP_SIZE_M": 8,
-            "num_stages": 3,
+            "num_stages": get_persistent_num_stages(a.device),
             "num_warps": 8,
         },
         torch.float32: {
@@ -348,7 +362,7 @@ def bmm_persistent(a: torch.Tensor, b: torch.Tensor):
             "BLOCK_SIZE_N": 128,
             "BLOCK_SIZE_K": 32,
             "GROUP_SIZE_M": 8,
-            "num_stages": 3,
+            "num_stages": get_persistent_num_stages(a.device),
             "num_warps": 8,
         },
     }
