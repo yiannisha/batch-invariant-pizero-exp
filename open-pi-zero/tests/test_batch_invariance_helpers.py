@@ -1,6 +1,6 @@
 import torch
 
-from experiments.common import load_numerical_freeze
+from experiments.common import load_numerical_freeze, sha256_tree
 from experiments.heldout_invariance import completed_fidelity_keys
 from src.model.paligemma.siglip import _UnfoldConv2d
 from src.model.attention import attention_implementation, attention_matmul
@@ -99,3 +99,20 @@ def test_numerical_freeze_validates_checkpoint(tmp_path):
     assert load_numerical_freeze(freeze, checkpoint)[
         "numerical_implementation_frozen"
     ]
+
+
+def test_sha256_tree_excludes_mutable_cache(tmp_path):
+    (tmp_path / "tokenizer.json").write_bytes(b"tokenizer")
+    cache = tmp_path / ".cache" / "download"
+    cache.mkdir(parents=True)
+    metadata = cache / "tokenizer.json.metadata"
+    metadata.write_bytes(b"first")
+
+    first = sha256_tree(tmp_path)
+    metadata.write_bytes(b"changed cache contents")
+    second = sha256_tree(tmp_path)
+
+    assert first == second
+    assert first["excluded_directories"] == [".cache"]
+    assert first["file_count"] == 1
+    assert [item["path"] for item in first["files"]] == ["tokenizer.json"]
