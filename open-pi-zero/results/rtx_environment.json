@@ -1,0 +1,60 @@
+{
+  "checkpoint": {
+    "identifier": "allenzren/open-pi-zero/fractal_beta_step29576_2024-12-29_13-10_42.pt",
+    "path": "/workspace/pizero-assets/checkpoint/fractal_beta_step29576_2024-12-29_13-10_42.pt",
+    "sha256": "1da40985d963ddf394fa63e7db5ddd4cd8082d5c6ce0b2a0cae56abd8b6ec0eb",
+    "size_bytes": 11774183772
+  },
+  "environment": {
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8"
+  },
+  "hardware": {
+    "gpu": {
+      "compute_capability": [
+        12,
+        0
+      ],
+      "multiprocessor_count": 188,
+      "name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "nvidia_smi": "NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887, 595.91.07, 600.00, 2430, 12481, Enabled",
+      "total_memory_bytes": 101975851008
+    }
+  },
+  "hostname": "5b58681f9e87",
+  "numerics": {
+    "cudnn_benchmark": false,
+    "deterministic_algorithms": false,
+    "execution": "eager",
+    "float32_matmul_precision": "highest",
+    "primary_dtype": "float32",
+    "tf32_cudnn": true,
+    "tf32_matmul": false
+  },
+  "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.39",
+  "repositories": {
+    "batch_invariant_ops": {
+      "git_sha": "8fdbcada1401608622a07e1d35b645973deb905d",
+      "integration_patch_revision": "8fdbcada1401608622a07e1d35b645973deb905d",
+      "path": "/workspace/current-paper-experiment-workdir/batch_invariant_ops",
+      "pr_27_base_revision": "679da28bd038c8e3d7c161b0486cac9c54c4f967"
+    },
+    "batch_invariant_pizero": {
+      "git_sha": "1fe465be27a773e14b5f37f4c0a8c0a553b7ce53",
+      "path": "/workspace/current-paper-experiment-workdir/batch-invariant-pizero"
+    }
+  },
+  "schema_version": 1,
+  "software": {
+    "cublas": "12.8.4.1-1",
+    "cuda_runtime": "12.8",
+    "cuda_toolkit": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2025 NVIDIA Corporation\nBuilt on Fri_Feb_21_20:23:50_PST_2025\nCuda compilation tools, release 12.8, V12.8.93\nBuild cuda_12.8.r12.8/compiler.35583870_0",
+    "cudnn": 91002,
+    "nvidia_driver": "595.91.07",
+    "python": "3.12.3",
+    "pytorch": "2.8.0+cu128",
+    "simpler": null,
+    "transformers": "4.57.1",
+    "triton": "3.4.0"
+  },
+  "timestamp": "2026-09-28T02:31:10.528340+00:00"
+}
