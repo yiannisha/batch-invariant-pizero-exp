@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "campaign": "rtx_heldout_invariance",
+  "launched_at": "2026-09-28T03:24:52Z",
+  "evaluation_harness_sha": "e12fc62cc2afb8236dd7bf4176e385863e2286f9",
+  "numerical_policy_sha": "a2576bbac02fca0ba1868843475f4a644835bdf1",
+  "frozen_operator_baseline_sha": "14dafb5fd84350dc796a96cbecb566ca6295593f",
+  "rtx_launch_adaptation_sha": "8fdbcada1401608622a07e1d35b645973deb905d",
+  "checkpoint_sha256": "1da40985d963ddf394fa63e7db5ddd4cd8082d5c6ce0b2a0cae56abd8b6ec0eb",
+  "replay_manifest_sha256": "7b2e3cee5635112b885862865a879d4e4a089efb292b10d50fdbf5e222f1dd08",
+  "rtx_environment_sha256": "291ba09f48c1aa30d05a1b69a1856f456436887578808117e32bfda1073bcb0c",
+  "split": "heldout",
+  "implementations": [
+    "native",
+    "full_invariant"
+  ],
+  "batch_sizes": [
+    1,
+    2,
+    4,
+    8
+  ],
+  "expected": {
+    "fixed_request_noise_pairs": 2400,
+    "arrangements_per_implementation_and_pair": 23,
+    "arrangement_records": 110400,
+    "singleton_fidelity_records": 2400
+  },
+  "execution": {
+    "python": "/workspace/pizero-assets/policy-venv/bin/python",
+    "tmux_session": "pizero-heldout",
+    "resume_enabled": true
+  }
+}

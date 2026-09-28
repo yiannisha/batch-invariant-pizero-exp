@@ -5,7 +5,7 @@ import json
 from collections import defaultdict
 from pathlib import Path
 
-from experiments.common import utc_timestamp, write_json
+from experiments.common import sha256_file, utc_timestamp, write_json
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -57,7 +57,10 @@ def heldout_audit(path: Path, fidelity_path: Path, freeze: dict) -> dict:
     assert len(groups) == 4_800
     assert all(len(items) == 23 for items in groups.values())
     full = by_implementation["full_invariant"]
-    assert len(full) == 52_800
+    # There are 23 arrangements per implementation/request.  The canonical
+    # singleton and the B=2 partition (a one-request physical partition) are
+    # both size one, leaving 21 physical nonsingleton arrangements.
+    assert len(full) == 50_400
     assert all(item["output"]["exact"] for item in full)
     return {
         "arrangement_records": len(records),
@@ -168,6 +171,7 @@ def main() -> None:
 
     environment = json.loads((RESULTS / "environment.json").read_text())
     rtx_environment = json.loads((RESULTS / "rtx_environment.json").read_text())
+    heldout_runtime = json.loads((RESULTS / "heldout" / "runtime.json").read_text())
     freeze = json.loads((RESULTS / "numerical_freeze.json").read_text())
     assert freeze["numerical_implementation_frozen"] and not freeze["dirty_status"]
     replay = json.loads((RESULTS / "replay_manifest.json").read_text())
@@ -179,6 +183,16 @@ def main() -> None:
         "request_noise_pairs": 3000,
     }
     assert replay["provenance"]["checkpoint_sha256"] == freeze["checkpoint"]["sha256"]
+    assert heldout_runtime["numerical_policy_sha"] == freeze["batch_invariant_pizero_sha"]
+    assert heldout_runtime["frozen_operator_baseline_sha"] == freeze["batch_invariant_ops_sha"]
+    assert heldout_runtime["checkpoint_sha256"] == freeze["checkpoint"]["sha256"]
+    assert heldout_runtime["rtx_launch_adaptation_sha"] == rtx_environment["repositories"]["batch_invariant_ops"]["git_sha"]
+    assert heldout_runtime["replay_manifest_sha256"] == sha256_file(
+        RESULTS / "replay_manifest.json"
+    )
+    assert heldout_runtime["rtx_environment_sha256"] == sha256_file(
+        RESULTS / "rtx_environment.json"
+    )
     assert all(Path(item["tensor_path"]).is_file() for item in replay["observations"])
     heldout = heldout_audit(
         RESULTS / "heldout" / "invariance.jsonl",
@@ -194,6 +208,11 @@ def main() -> None:
     for relative in (
         "artifacts/figures/flow_step_propagation.png",
         "artifacts/figures/serving_tradeoff.png",
+        "artifacts/tables/operator_projection.csv",
+        "artifacts/tables/policy_ablation.csv",
+        "artifacts/tables/simpler.csv",
+        "results/heldout/flow_step_summary.json",
+        "results/simpler/summary.json",
         "results/EXPERIMENT_REPORT.md",
     ):
         assert (ROOT / relative).stat().st_size > 0
@@ -242,6 +261,7 @@ def main() -> None:
             "checkpoint_sha256": freeze["checkpoint"]["sha256"],
             "rtx_environment_policy_sha": rtx_environment["repositories"]["batch_invariant_pizero"]["git_sha"],
             "rtx_runtime_operator_sha": rtx_environment["repositories"]["batch_invariant_ops"]["git_sha"],
+            "heldout_evaluation_harness_sha": heldout_runtime["evaluation_harness_sha"],
         },
         "historical_h100_simulator_blocker": historical_blocker,
     }

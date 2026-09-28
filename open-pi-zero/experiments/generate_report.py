@@ -89,6 +89,8 @@ def flow_step_summary(records: list[dict], implementation: str) -> dict[int, dic
 
 def main() -> None:
     environment = load_json(RESULTS / "environment.json", {})
+    rtx_environment = load_json(RESULTS / "rtx_environment.json", {})
+    heldout_runtime = load_json(RESULTS / "heldout" / "runtime.json", {})
     freeze = load_json(RESULTS / "numerical_freeze.json", {})
     heldout = load_jsonl(RESULTS / "heldout" / "invariance.jsonl")
     diagnostic = load_jsonl(RESULTS / "diagnostic" / "policy_ablation.jsonl")
@@ -125,7 +127,10 @@ def main() -> None:
         "",
         f"- Policy revision: `{freeze.get('batch_invariant_pizero_sha') or environment.get('repositories', {}).get('batch_invariant_pizero', {}).get('git_sha', 'unavailable')}`",
         f"- Operator revision: `{freeze.get('batch_invariant_ops_sha') or environment.get('repositories', {}).get('batch_invariant_ops', {}).get('git_sha', 'unavailable')}`",
+        f"- RTX launch-only operator adaptation: `{heldout_runtime.get('rtx_launch_adaptation_sha', 'unavailable')}`",
+        f"- RTX evaluation harness revision: `{heldout_runtime.get('evaluation_harness_sha', 'unavailable')}`",
         f"- Checkpoint SHA-256: `{environment.get('checkpoint', {}).get('sha256', 'unavailable')}`",
+        f"- RTX GPU: `{rtx_environment.get('hardware', {}).get('gpu', {}).get('name', 'unavailable')}`",
         f"- Evaluation scope used below: **{scope}**",
         "",
         "## A. Does native inference violate request-level batch invariance?",
