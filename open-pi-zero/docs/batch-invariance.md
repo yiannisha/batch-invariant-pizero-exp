@@ -9,7 +9,7 @@ parallel reduction, or accumulation schedules for different shapes. Floating
 point addition is not associative, so those schedules can produce different
 rounding and change a downstream result.
 
-This project uses the following protocol:
+The lightweight synthetic sample uses the following protocol:
 
 1. Seed Python, NumPy, and PyTorch.
 2. Construct one fixed reference sample and one fixed initial action noise.
@@ -47,6 +47,11 @@ tensors and therefore has a real memory cost. It should not be enabled in a
 training or production inference path.
 
 ## Limitations
+
+These limitations describe the lightweight sample above. The pretrained
+campaign separately qualifies the complete exercised dispatch path and records
+its evidence under `results/`; see `experiments/README.md` and the generated
+experimental report.
 
 - The Triton dispatch layer currently targets CUDA and depends on the installed
   PyTorch/Triton ABI. CPU and MPS runs exercise the model and helper paths but
