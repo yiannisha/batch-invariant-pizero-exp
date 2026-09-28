@@ -19,6 +19,12 @@ def jsonl(path: Path) -> list[dict]:
         return [json.loads(line) for line in stream if line.strip()]
 
 
+def assert_file_identity(identity: dict) -> None:
+    path = Path(identity["path"])
+    assert path.stat().st_size == identity["size_bytes"]
+    assert sha256_file(path) == identity["sha256"]
+
+
 def arrangement_key(item: dict) -> tuple:
     return (
         item["transformation"],
@@ -354,6 +360,11 @@ def simpler_audit(
     assert runtime["tokenizer"] == sha256_tree(
         Path(runtime["execution"]["tokenizer_path"])
     )
+    assert_file_identity(runtime["graphics_runtime"]["vulkan_icd"])
+    assert_file_identity(runtime["graphics_runtime"]["egl_loader"])
+    assert runtime["graphics_runtime"]["VK_DRIVER_FILES"] == \
+        runtime["execution"]["vulkan_icd"]
+    assert runtime["graphics_runtime"]["VK_LOADER_LAYERS_DISABLE"] == "~implicit~"
     assert runtime["repositories"] == {
         "simpler_env_sha": "59ad9e1539042ed333fd8ebba1b0395f5662f0bd",
         "maniskill2_real2sim_sha": "91d154bfd864577f8d2e80f3fc2f8b4d9df9ae5c",
@@ -428,6 +439,8 @@ def simpler_audit(
             "simpler_env_sha": runtime["repositories"]["simpler_env_sha"],
             "maniskill2_real2sim_sha": runtime["repositories"]["maniskill2_real2sim_sha"],
             "tokenizer_sha256": runtime["tokenizer"]["sha256"],
+            "vulkan_icd_sha256": runtime["graphics_runtime"]["vulkan_icd"]["sha256"],
+            "egl_loader_sha256": runtime["graphics_runtime"]["egl_loader"]["sha256"],
         },
     }
 

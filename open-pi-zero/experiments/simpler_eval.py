@@ -59,6 +59,25 @@ def git_sha(path: Path | None) -> str | None:
     return run_text(["git", "rev-parse", "HEAD"], cwd=path)
 
 
+def file_identity(path: Path) -> dict:
+    resolved = path.resolve()
+    return {
+        "path": str(resolved),
+        "size_bytes": resolved.stat().st_size,
+        "sha256": sha256_file(resolved),
+    }
+
+
+def egl_loader_identity() -> dict | None:
+    for directory in os.environ.get("LD_LIBRARY_PATH", "").split(":"):
+        if not directory:
+            continue
+        candidate = Path(directory) / "libEGL.so.1"
+        if candidate.is_file():
+            return file_identity(candidate)
+    return None
+
+
 def write_runtime_provenance(args, freeze: dict) -> Path:
     runtime_path = args.output.parent / "runtime.json"
     project_root = Path(__file__).resolve().parents[1]
@@ -77,6 +96,19 @@ def write_runtime_provenance(args, freeze: dict) -> Path:
         "replay_manifest_sha256": sha256_file(args.replay_manifest),
         "rtx_environment_sha256": sha256_file(rtx_environment_path),
         "tokenizer": sha256_tree(args.tokenizer),
+        "graphics_runtime": {
+            "vulkan_icd": (
+                file_identity(args.vulkan_icd) if args.vulkan_icd else None
+            ),
+            "egl_loader": egl_loader_identity(),
+            "VK_DRIVER_FILES": os.environ.get("VK_DRIVER_FILES"),
+            "VK_LOADER_LAYERS_DISABLE": os.environ.get(
+                "VK_LOADER_LAYERS_DISABLE"
+            ),
+            "NVIDIA_DRIVER_CAPABILITIES": os.environ.get(
+                "NVIDIA_DRIVER_CAPABILITIES"
+            ),
+        },
         "source_sha256": source_hashes(),
         "repositories": {
             "simpler_env_sha": git_sha(simpler_root),
