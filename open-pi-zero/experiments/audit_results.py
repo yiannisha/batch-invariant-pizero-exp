@@ -7,7 +7,7 @@ from collections import defaultdict
 from pathlib import Path
 from uuid import UUID
 
-from experiments.common import sha256_file, utc_timestamp, write_json
+from experiments.common import sha256_file, sha256_tree, utc_timestamp, write_json
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -351,6 +351,9 @@ def simpler_audit(
     assert runtime["rtx_environment_sha256"] == sha256_file(
         RESULTS / "rtx_environment.json"
     )
+    assert runtime["tokenizer"] == sha256_tree(
+        Path(runtime["execution"]["tokenizer_path"])
+    )
     assert runtime["repositories"] == {
         "simpler_env_sha": "59ad9e1539042ed333fd8ebba1b0395f5662f0bd",
         "maniskill2_real2sim_sha": "91d154bfd864577f8d2e80f3fc2f8b4d9df9ae5c",
@@ -424,6 +427,7 @@ def simpler_audit(
             "rtx_launch_adaptation_sha": runtime["rtx_launch_adaptation_sha"],
             "simpler_env_sha": runtime["repositories"]["simpler_env_sha"],
             "maniskill2_real2sim_sha": runtime["repositories"]["maniskill2_real2sim_sha"],
+            "tokenizer_sha256": runtime["tokenizer"]["sha256"],
         },
     }
 

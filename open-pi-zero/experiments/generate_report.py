@@ -145,6 +145,7 @@ def main() -> None:
         f"- SIMPLER evaluator source SHA-256: `{simpler_runtime.get('source_sha256', {}).get('simpler_eval.py', 'unavailable')}`",
         f"- SIMPLER revision: `{simpler_runtime.get('repositories', {}).get('simpler_env_sha', 'unavailable')}`",
         f"- ManiSkill2_real2sim revision: `{simpler_runtime.get('repositories', {}).get('maniskill2_real2sim_sha', 'unavailable')}`",
+        f"- Tokenizer tree SHA-256: `{simpler_runtime.get('tokenizer', {}).get('sha256', 'unavailable')}`",
         f"- Checkpoint SHA-256: `{environment.get('checkpoint', {}).get('sha256', 'unavailable')}`",
         f"- RTX GPU: `{rtx_environment.get('hardware', {}).get('gpu', {}).get('name', 'unavailable')}`",
         f"- Evaluation scope used below: **{scope}**",

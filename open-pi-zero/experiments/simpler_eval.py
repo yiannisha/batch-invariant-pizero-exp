@@ -19,6 +19,7 @@ from experiments.common import (
     run_text,
     run_policy,
     sha256_file,
+    sha256_tree,
     utc_timestamp,
     write_json,
 )
@@ -75,6 +76,7 @@ def write_runtime_provenance(args, freeze: dict) -> Path:
         "checkpoint_sha256": freeze["checkpoint"]["sha256"],
         "replay_manifest_sha256": sha256_file(args.replay_manifest),
         "rtx_environment_sha256": sha256_file(rtx_environment_path),
+        "tokenizer": sha256_tree(args.tokenizer),
         "source_sha256": source_hashes(),
         "repositories": {
             "simpler_env_sha": git_sha(simpler_root),
@@ -98,6 +100,7 @@ def write_runtime_provenance(args, freeze: dict) -> Path:
         "execution": {
             "policy_python": os.path.realpath(os.sys.executable),
             "simpler_python": str(args.simpler_python.resolve()) if args.simpler_python else None,
+            "tokenizer_path": str(args.tokenizer.resolve()),
             "vulkan_icd": str(args.vulkan_icd.resolve()) if args.vulkan_icd else None,
             "resume_enabled": args.resume,
         },

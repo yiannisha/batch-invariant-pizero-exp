@@ -110,6 +110,30 @@ def sha256_file(path: Path, chunk_size: int = 16 * 1024 * 1024) -> str:
     return digest.hexdigest()
 
 
+def sha256_tree(path: Path) -> dict:
+    path = path.resolve()
+    files = []
+    for item in sorted(path.rglob("*")):
+        relative = item.relative_to(path)
+        if not item.is_file() or ".cache" in relative.parts:
+            continue
+        files.append(
+            {
+                "path": relative.as_posix(),
+                "size_bytes": item.stat().st_size,
+                "sha256": sha256_file(item),
+            }
+        )
+    canonical = json.dumps(files, sort_keys=True, separators=(",", ":")).encode()
+    return {
+        "excluded_directories": [".cache"],
+        "file_count": len(files),
+        "size_bytes": sum(item["size_bytes"] for item in files),
+        "sha256": hashlib.sha256(canonical).hexdigest(),
+        "files": files,
+    }
+
+
 def load_numerical_freeze(path: Path | str, checkpoint: Path | str) -> dict:
     path = Path(path)
     checkpoint = Path(checkpoint)
