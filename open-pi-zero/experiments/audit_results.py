@@ -18,6 +18,36 @@ def jsonl(path: Path) -> list[dict]:
         return [json.loads(line) for line in stream if line.strip()]
 
 
+def arrangement_key(item: dict) -> tuple:
+    return (
+        item["transformation"],
+        item["batch_size"],
+        item["target_batch_position"],
+        item["companion_type"],
+    )
+
+
+def assert_complete_arrangement_groups(groups: dict) -> None:
+    expected_transformations = {
+        "singleton": 1,
+        "batch_position": 16,
+        "permutation": 3,
+        "partition": 3,
+    }
+    expected_batch_sizes = {1: 2, 2: 6, 4: 8, 8: 7}
+    for items in groups.values():
+        assert len(items) == 23
+        assert len({arrangement_key(item) for item in items}) == 23
+        assert {
+            name: sum(item["transformation"] == name for item in items)
+            for name in expected_transformations
+        } == expected_transformations
+        assert {
+            batch_size: sum(item["batch_size"] == batch_size for item in items)
+            for batch_size in expected_batch_sizes
+        } == expected_batch_sizes
+
+
 def policy_audit(path: Path, expected: int) -> dict:
     records = jsonl(path)
     assert len(records) == expected, (path, len(records), expected)
@@ -56,7 +86,7 @@ def heldout_audit(path: Path, fidelity_path: Path, freeze: dict) -> dict:
         if item["batch_size"] > 1:
             by_implementation[item["implementation"]].append(item)
     assert len(groups) == 4_800
-    assert all(len(items) == 23 for items in groups.values())
+    assert_complete_arrangement_groups(groups)
     full = by_implementation["full_invariant"]
     # There are 23 arrangements per implementation/request.  The canonical
     # singleton and the B=2 partition (a one-request physical partition) are
@@ -102,7 +132,7 @@ def diagnostic_replay_audit(path: Path, fidelity_path: Path, freeze: dict) -> di
         groups[(item["request_id"], item["implementation"])].append(item)
         by_implementation[item["implementation"]].append(item)
     assert len(groups) == 48
-    assert all(len(items) == 23 for items in groups.values())
+    assert_complete_arrangement_groups(groups)
     assert all(item["output"]["exact"] for item in by_implementation["full_invariant"])
     return {
         "arrangement_records": len(records),
