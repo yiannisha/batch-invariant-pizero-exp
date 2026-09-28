@@ -147,10 +147,16 @@ def main() -> None:
     parser.add_argument("--output", type=Path, default=Path("results/heldout/invariance.jsonl"))
     parser.add_argument("--fidelity-output", type=Path, default=Path("results/heldout/singleton_fidelity.jsonl"))
     parser.add_argument("--split", choices=("diagnostic", "heldout"), default="heldout")
+    parser.add_argument(
+        "--tasks",
+        nargs="+",
+        help="optional task-name subset, applied before --limit",
+    )
     parser.add_argument("--implementations", nargs="+", default=("native", "full_invariant"))
     parser.add_argument("--batch-sizes", type=int, nargs="+", default=(1, 2, 4, 8))
     parser.add_argument("--dtype", choices=("float32", "bfloat16"), default="float32")
     parser.add_argument("--limit", type=int)
+    parser.add_argument("--limit-per-task", type=int)
     parser.add_argument("--resume", action="store_true")
     args = parser.parse_args()
     if args.output.exists() and not args.resume:
@@ -171,6 +177,24 @@ def main() -> None:
     manifest = json.loads(args.manifest.read_text())
     statistics = json.loads(args.statistics.read_text())
     observations = [item for item in manifest["observations"] if item["split"] == args.split]
+    if args.tasks is not None:
+        requested_tasks = set(args.tasks)
+        known_tasks = {item["task"] for item in manifest["observations"]}
+        unknown_tasks = requested_tasks - known_tasks
+        if unknown_tasks:
+            raise ValueError(f"unknown tasks: {sorted(unknown_tasks)}")
+        observations = [
+            item for item in observations if item["task"] in requested_tasks
+        ]
+    if args.limit_per_task is not None:
+        retained = []
+        task_counts = {}
+        for item in observations:
+            count = task_counts.get(item["task"], 0)
+            if count < args.limit_per_task:
+                retained.append(item)
+                task_counts[item["task"]] = count + 1
+        observations = retained
     if args.limit is not None:
         observations = observations[: args.limit]
     dtype = getattr(torch, args.dtype)
