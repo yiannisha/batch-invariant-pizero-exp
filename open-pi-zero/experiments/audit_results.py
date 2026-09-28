@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import math
 from collections import defaultdict
 from pathlib import Path
 
@@ -134,7 +135,13 @@ def flow_summary_audit(path: Path) -> dict:
     return summary
 
 
-def simpler_audit(path: Path, summary_path: Path, freeze: dict) -> dict:
+def simpler_audit(
+    path: Path,
+    summary_path: Path,
+    runtime_path: Path,
+    freeze: dict,
+    rtx_environment: dict,
+) -> dict:
     episodes = jsonl(path)
     assert len(episodes) == 800, (path, len(episodes), 800)
     keys = {
@@ -149,12 +156,68 @@ def simpler_audit(path: Path, summary_path: Path, freeze: dict) -> dict:
         "native_singleton", "native_dynamic",
         "patched_singleton", "patched_dynamic",
     }
+    expected_conditions = {
+        "native_singleton": ("native", False, [1]),
+        "native_dynamic": ("native", True, [1, 2, 4, 8]),
+        "patched_singleton": ("full_invariant", False, [1]),
+        "patched_dynamic": ("full_invariant", True, [1, 2, 4, 8]),
+    }
     assert all(
         item["numerical_policy_sha"] == freeze["batch_invariant_pizero_sha"]
         and item["batch_invariant_ops_sha"] == freeze["batch_invariant_ops_sha"]
         and item["checkpoint_sha256"] == freeze["checkpoint"]["sha256"]
         for item in episodes
     )
+    assert all(
+        (
+            item["implementation"],
+            item["dynamic_batching"],
+            item["dynamic_batch_cycle"],
+        )
+        == expected_conditions[item["condition"]]
+        and item["initialization_seed"] == 20250311 + item["initialization_id"]
+        and item["policy_noise_scheme"]
+        == "sha256-indexed-by-task-initialization-policy-call"
+        and item["trajectory"]
+        for item in episodes
+    )
+    for task in {item["task"] for item in episodes}:
+        for condition in expected_conditions:
+            assert {
+                item["initialization_id"]
+                for item in episodes
+                if item["task"] == task and item["condition"] == condition
+            } == set(range(50))
+    runtime = json.loads(runtime_path.read_text())
+    assert runtime["campaign"] == "paired_closed_loop_simpler"
+    assert runtime["expected_episodes"] == 800
+    assert runtime["initializations_per_task"] == 50
+    assert runtime["seed"] == 20250311
+    assert runtime["tasks"] == sorted({item["task"] for item in episodes})
+    assert runtime["numerical_policy_sha"] == freeze["batch_invariant_pizero_sha"]
+    assert runtime["frozen_operator_baseline_sha"] == freeze["batch_invariant_ops_sha"]
+    assert runtime["checkpoint_sha256"] == freeze["checkpoint"]["sha256"]
+    assert runtime["rtx_launch_adaptation_sha"] == rtx_environment["repositories"]["batch_invariant_ops"]["git_sha"]
+    assert runtime["replay_manifest_sha256"] == sha256_file(
+        RESULTS / "replay_manifest.json"
+    )
+    assert runtime["rtx_environment_sha256"] == sha256_file(
+        RESULTS / "rtx_environment.json"
+    )
+    assert runtime["repositories"] == {
+        "simpler_env_sha": "59ad9e1539042ed333fd8ebba1b0395f5662f0bd",
+        "maniskill2_real2sim_sha": "91d154bfd864577f8d2e80f3fc2f8b4d9df9ae5c",
+    }
+    source_directory = ROOT / "experiments"
+    assert runtime["source_sha256"] == {
+        name: sha256_file(source_directory / name)
+        for name in (
+            "simpler_eval.py",
+            "simpler_worker.py",
+            "simpler_support.py",
+            "analyze_simpler.py",
+        )
+    }
     summary = json.loads(summary_path.read_text())
     assert summary["bootstrap"] == {
         "seed": 20250401,
@@ -163,11 +226,57 @@ def simpler_audit(path: Path, summary_path: Path, freeze: dict) -> dict:
     }
     assert set(summary["tasks"]) == {item["task"] for item in episodes}
     assert all(item["episodes"] == 50 for item in summary["tasks"].values())
+    expected_comparisons = {
+        "native_dynamic_minus_singleton",
+        "patched_dynamic_minus_singleton",
+        "patched_minus_native_singleton",
+    }
+    for task_index, task in enumerate(sorted(summary["tasks"])):
+        task_summary = summary["tasks"][task]
+        assert set(task_summary["success_rate"]) == set(expected_conditions)
+        assert all(
+            math.isfinite(value) and 0.0 <= value <= 1.0
+            for value in task_summary["success_rate"].values()
+        )
+        assert set(task_summary["paired_differences"]) == expected_comparisons
+        assert set(task_summary["trajectory_pairs"]) == expected_comparisons
+        for comparison in expected_comparisons:
+            paired = task_summary["paired_differences"][comparison]
+            assert paired["bootstrap_seed"] == 20250401 + task_index
+            assert paired["bootstrap_resamples"] == 10000
+            assert paired["unit"] == "episode"
+            assert 0 <= paired["disagreement_count"] <= 50
+            assert math.isfinite(paired["estimate"])
+            assert len(paired["ci95"]) == 2
+            assert all(math.isfinite(value) for value in paired["ci95"])
+            trajectories = task_summary["trajectory_pairs"][comparison]
+            assert len(trajectories) == 50
+            assert all(
+                item["aligned_state_count"] > 0
+                and all(
+                    math.isfinite(item[key]) and item[key] >= 0.0
+                    for key in (
+                        "end_effector_position_max_m",
+                        "end_effector_position_terminal_m",
+                        "end_effector_rotation_max_rad",
+                        "end_effector_rotation_terminal_rad",
+                        "gripper_max_native_units",
+                        "gripper_terminal_native_units",
+                    )
+                )
+                for item in trajectories
+            )
     return {
         "episodes": len(episodes),
         "matched_initializations_per_task": 50,
         "conditions": 4,
         "bootstrap": summary["bootstrap"],
+        "runtime_provenance": {
+            "evaluation_harness_sha": runtime["evaluation_harness_sha"],
+            "rtx_launch_adaptation_sha": runtime["rtx_launch_adaptation_sha"],
+            "simpler_env_sha": runtime["repositories"]["simpler_env_sha"],
+            "maniskill2_real2sim_sha": runtime["repositories"]["maniskill2_real2sim_sha"],
+        },
     }
 
 
@@ -257,7 +366,9 @@ def main() -> None:
     simpler = simpler_audit(
         RESULTS / "simpler" / "episodes.jsonl",
         RESULTS / "simpler" / "summary.json",
+        RESULTS / "simpler" / "runtime.json",
         freeze,
+        rtx_environment,
     )
     flow_summary = flow_summary_audit(
         RESULTS / "heldout" / "flow_step_summary.json"
@@ -338,6 +449,7 @@ def main() -> None:
             "rtx_environment_policy_sha": rtx_environment["repositories"]["batch_invariant_pizero"]["git_sha"],
             "rtx_runtime_operator_sha": rtx_environment["repositories"]["batch_invariant_ops"]["git_sha"],
             "heldout_evaluation_harness_sha": heldout_runtime["evaluation_harness_sha"],
+            "simpler_evaluation_harness_sha": simpler["runtime_provenance"]["evaluation_harness_sha"],
         },
         "historical_h100_simulator_blocker": historical_blocker,
     }

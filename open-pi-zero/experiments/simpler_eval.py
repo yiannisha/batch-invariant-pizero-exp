@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 
 import numpy as np
@@ -14,8 +15,11 @@ from experiments.common import (
     load_numerical_freeze,
     load_pretrained_policy,
     prepare_inputs,
+    run_text,
     run_policy,
+    sha256_file,
     utc_timestamp,
+    write_json,
 )
 from experiments.heldout_invariance import concatenate, raw_request
 from experiments.prepare_replay import TASKS
@@ -32,6 +36,100 @@ CONDITIONS = {
     "patched_singleton": ("full_invariant", False),
     "patched_dynamic": ("full_invariant", True),
 }
+
+
+def source_hashes() -> dict[str, str]:
+    directory = Path(__file__).resolve().parent
+    return {
+        name: sha256_file(directory / name)
+        for name in (
+            "simpler_eval.py",
+            "simpler_worker.py",
+            "simpler_support.py",
+            "analyze_simpler.py",
+        )
+    }
+
+
+def git_sha(path: Path | None) -> str | None:
+    if path is None:
+        return None
+    return run_text(["git", "rev-parse", "HEAD"], cwd=path)
+
+
+def write_runtime_provenance(args, freeze: dict) -> Path:
+    runtime_path = args.output.parent / "runtime.json"
+    project_root = Path(__file__).resolve().parents[1]
+    ops_root_value = os.environ.get("BATCH_INVARIANT_OPS_REPO")
+    ops_root = Path(ops_root_value).resolve() if ops_root_value else None
+    simpler_root = args.simpler_root.resolve() if args.simpler_root else None
+    rtx_environment_path = project_root / "results" / "rtx_environment.json"
+    device = torch.cuda.get_device_properties(torch.cuda.current_device())
+    identity = {
+        "campaign": "paired_closed_loop_simpler",
+        "evaluation_harness_sha": git_sha(project_root),
+        "numerical_policy_sha": freeze["batch_invariant_pizero_sha"],
+        "frozen_operator_baseline_sha": freeze["batch_invariant_ops_sha"],
+        "rtx_launch_adaptation_sha": git_sha(ops_root),
+        "checkpoint_sha256": freeze["checkpoint"]["sha256"],
+        "replay_manifest_sha256": sha256_file(args.replay_manifest),
+        "rtx_environment_sha256": sha256_file(rtx_environment_path),
+        "source_sha256": source_hashes(),
+        "repositories": {
+            "simpler_env_sha": git_sha(simpler_root),
+            "maniskill2_real2sim_sha": git_sha(
+                simpler_root / "ManiSkill2_real2sim" if simpler_root else None
+            ),
+        },
+        "conditions": {
+            name: {
+                "implementation": implementation,
+                "dynamic_batching": dynamic,
+            }
+            for name, (implementation, dynamic) in CONDITIONS.items()
+        },
+        "initializations_per_task": args.initializations,
+        "tasks": sorted(TASKS),
+        "seed": args.seed,
+        "expected_episodes": args.initializations * len(TASKS) * len(CONDITIONS),
+        "policy_noise_scheme": "sha256-indexed-by-task-initialization-policy-call",
+        "dynamic_batch_cycle": [1, 2, 4, 8],
+        "execution": {
+            "policy_python": os.path.realpath(os.sys.executable),
+            "simpler_python": str(args.simpler_python.resolve()) if args.simpler_python else None,
+            "vulkan_icd": str(args.vulkan_icd.resolve()) if args.vulkan_icd else None,
+            "resume_enabled": args.resume,
+        },
+        "hardware": {
+            "gpu_name": device.name,
+            "compute_capability": [device.major, device.minor],
+            "total_memory_bytes": device.total_memory,
+        },
+        "software": {
+            "pytorch": torch.__version__,
+            "cuda_runtime": torch.version.cuda,
+        },
+    }
+    if runtime_path.exists():
+        existing = json.loads(runtime_path.read_text())
+        for key, value in identity.items():
+            if existing.get(key) != value:
+                raise RuntimeError(
+                    f"refusing to resume SIMPLER with changed runtime provenance: {key}"
+                )
+        existing.setdefault("resume_events", []).append(utc_timestamp())
+        write_json(runtime_path, existing)
+        return runtime_path
+    write_json(
+        runtime_path,
+        {
+            "schema_version": 1,
+            "launched_at": utc_timestamp(),
+            **identity,
+            "resume_events": [],
+        },
+    )
+    return runtime_path
 
 
 def indexed_noise(task: str, initialization: int, policy_call: int) -> torch.Tensor:
@@ -85,6 +183,8 @@ def main() -> None:
         raise RuntimeError("replay manifest and numerical freeze revisions differ")
     if replay_provenance.get("checkpoint_sha256") != freeze["checkpoint"]["sha256"]:
         raise RuntimeError("replay manifest and frozen checkpoint differ")
+    runtime_path = write_runtime_provenance(args, freeze)
+    print(runtime_path)
     if args.output.exists():
         with args.output.open() as stream:
             revisions = {

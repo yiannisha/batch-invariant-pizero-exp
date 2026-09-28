@@ -115,6 +115,7 @@ def main() -> None:
     serving = load_json(RESULTS / "serving" / "summary.json", [])
     simpler_episodes = load_jsonl(RESULTS / "simpler" / "episodes.jsonl")
     simpler_summary = load_json(RESULTS / "simpler" / "summary.json", {})
+    simpler_runtime = load_json(RESULTS / "simpler" / "runtime.json", {})
     simpler_blocker = load_json(RESULTS / "simpler" / "blocker.json")
 
     lines = [
@@ -129,6 +130,10 @@ def main() -> None:
         f"- Operator revision: `{freeze.get('batch_invariant_ops_sha') or environment.get('repositories', {}).get('batch_invariant_ops', {}).get('git_sha', 'unavailable')}`",
         f"- RTX launch-only operator adaptation: `{heldout_runtime.get('rtx_launch_adaptation_sha', 'unavailable')}`",
         f"- RTX evaluation harness revision: `{heldout_runtime.get('evaluation_harness_sha', 'unavailable')}`",
+        f"- SIMPLER evaluator revision: `{simpler_runtime.get('evaluation_harness_sha', 'unavailable')}`",
+        f"- SIMPLER evaluator source SHA-256: `{simpler_runtime.get('source_sha256', {}).get('simpler_eval.py', 'unavailable')}`",
+        f"- SIMPLER revision: `{simpler_runtime.get('repositories', {}).get('simpler_env_sha', 'unavailable')}`",
+        f"- ManiSkill2_real2sim revision: `{simpler_runtime.get('repositories', {}).get('maniskill2_real2sim_sha', 'unavailable')}`",
         f"- Checkpoint SHA-256: `{environment.get('checkpoint', {}).get('sha256', 'unavailable')}`",
         f"- RTX GPU: `{rtx_environment.get('hardware', {}).get('gpu', {}).get('name', 'unavailable')}`",
         f"- Evaluation scope used below: **{scope}**",
