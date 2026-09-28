@@ -472,6 +472,10 @@ def main() -> None:
     assert all(f"## {letter}." in report for letter in "ABCDEFGH")
     assert "0/800 planned episodes were executed" not in report
     assert "replay dataset could not be collected" not in report
+    assert "First-divergence category frequencies" in report
+    assert "Trajectory formulas:" in report
+    assert "Persistent-vs-explicit invariant kernel differences:" in report
+    assert "Complete-policy invariant-vs-native dynamic differences" in report
 
     audit = {
         "schema_version": 1,

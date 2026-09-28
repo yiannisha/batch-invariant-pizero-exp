@@ -41,6 +41,17 @@ def percentile(values: list[float], quantile: float) -> float:
     return ordered[lower] * (1 - fraction) + ordered[upper] * fraction
 
 
+def divergence_boundary(trace_key: str | None) -> str:
+    if trace_key is None:
+        return "no divergence"
+    lowered = trace_key.lower()
+    if "patch" in lowered or "vision_tower" in lowered:
+        return "visual patch projection"
+    if any(token in lowered for token in ("attn", "attention", "bmm")):
+        return "attention/BMM"
+    return "other boundary"
+
+
 def policy_summary(records: list[dict]) -> dict[str, dict]:
     grouped = defaultdict(list)
     for record in records:
@@ -204,6 +215,26 @@ def main() -> None:
 
     lines += ["", "## B. Where does native execution first diverge?", ""]
     if trace:
+        boundary_counts = Counter(
+            divergence_boundary(
+                payload.get("first_divergence", {}).get("trace_key")
+                if payload.get("first_divergence") else None
+            )
+            for payload in trace.values()
+        )
+        lines.append(
+            "First-divergence category frequencies across the one retained frozen B=2 "
+            "diverse trace per implementation mode (descriptive mode counts, not a "
+            "held-out incidence estimate): "
+            + ", ".join(
+                f"{name}={boundary_counts.get(name, 0)}/{len(trace)}"
+                for name in (
+                    "visual patch projection", "attention/BMM",
+                    "other boundary", "no divergence",
+                )
+            )
+            + "."
+        )
         for implementation, payload in trace.items():
             first = payload.get("first_divergence")
             boundary = first.get("trace_key") if first else "none (all traced tensors exact)"
@@ -325,6 +356,13 @@ def main() -> None:
         lines.append(
             f"The paired closed-loop campaign completed {len(simpler_episodes)}/800 episodes."
         )
+        lines.append(
+            "Trajectory formulas: position is the Euclidean norm of paired end-effector "
+            "XYZ differences in meters; rotation is the unit-quaternion geodesic "
+            "2*arccos(|q1 dot q2|) in radians; gripper is absolute scalar difference in "
+            "simulator-native units. States are aligned by step index through the shorter "
+            "trajectory, and terminal denotes the last state of that aligned prefix."
+        )
         for task, result in sorted(simpler_summary["tasks"].items()):
             rates = result["success_rate"]
             lines.append(
@@ -341,9 +379,14 @@ def main() -> None:
                 )
             for comparison, values in result["trajectory_pairs"].items():
                 lines.append(
-                    f"  - `{comparison}` trajectory maxima: position="
-                    f"{fmt(max(item['end_effector_position_max_m'] for item in values))} m, "
-                    f"rotation={fmt(max(item['end_effector_rotation_max_rad'] for item in values))} rad."
+                    f"  - `{comparison}` trajectory differences across matched pairs: maximum "
+                    f"position={fmt(max(item['end_effector_position_max_m'] for item in values))} m, "
+                    f"rotation={fmt(max(item['end_effector_rotation_max_rad'] for item in values))} rad, "
+                    f"gripper={fmt(max(item['gripper_max_native_units'] for item in values))} native units; "
+                    f"maximum aligned-terminal position="
+                    f"{fmt(max(item['end_effector_position_terminal_m'] for item in values))} m, "
+                    f"rotation={fmt(max(item['end_effector_rotation_terminal_rad'] for item in values))} rad, "
+                    f"gripper={fmt(max(item['gripper_terminal_native_units'] for item in values))} native units."
                 )
     elif simpler_blocker:
         lines += [
@@ -366,6 +409,25 @@ def main() -> None:
                     f"{fmt(item['median_latency_ms'])} ms, p95 {fmt(item['p95_latency_ms'])} ms, "
                     f"{item['kernel_launch_count']} profiled device launches."
                 )
+        kernel_by_key = {
+            (item["operator"], item["batch_size"], item["implementation"]): item
+            for item in kernel
+        }
+        lines.append("Persistent-vs-explicit invariant kernel differences:")
+        for operator_name, batch_size in sorted({
+            (item["operator"], item["batch_size"]) for item in kernel
+        }):
+            explicit = kernel_by_key[(operator_name, batch_size, "explicit_invariant_mm")]
+            persistent = kernel_by_key[(operator_name, batch_size, "persistent_invariant_bmm")]
+            lines.append(
+                f"- {operator_name} B={batch_size}: persistent median latency is "
+                f"{fmt(explicit['median_latency_ms'] / persistent['median_latency_ms'])}x faster "
+                f"({fmt(explicit['median_latency_ms'] - persistent['median_latency_ms'])} ms lower), "
+                f"throughput is {fmt(persistent['requests_per_second'] / explicit['requests_per_second'])}x, "
+                f"and launches are reduced by "
+                f"{explicit['kernel_launch_count'] - persistent['kernel_launch_count']} "
+                f"({explicit['kernel_launch_count']} to {persistent['kernel_launch_count']})."
+            )
     else:
         lines.append("Kernel timings unavailable.")
     if policy_perf:
@@ -375,6 +437,19 @@ def main() -> None:
                 f"p95 {fmt(item['p95_latency_ms'])} ms, {fmt(item['requests_per_second'])} requests/s, "
                 f"peak {item['peak_allocated_bytes']} bytes, launches {item['kernel_launch_count']}."
             )
+        policy_by_name = {item["configuration"]: item for item in policy_perf}
+        native_dynamic = policy_by_name["native_dynamic"]
+        invariant_dynamic = policy_by_name["invariant_dynamic"]
+        lines.append(
+            "Complete-policy invariant-vs-native dynamic differences at logical B=4: "
+            f"median latency +{fmt(invariant_dynamic['median_latency_ms'] - native_dynamic['median_latency_ms'])} ms "
+            f"({fmt(invariant_dynamic['median_latency_ms'] / native_dynamic['median_latency_ms'])}x native), "
+            f"throughput {fmt(invariant_dynamic['requests_per_second'] - native_dynamic['requests_per_second'])} "
+            f"requests/s ({fmt(invariant_dynamic['requests_per_second'] / native_dynamic['requests_per_second'])}x), "
+            f"peak allocation {invariant_dynamic['peak_allocated_bytes'] - native_dynamic['peak_allocated_bytes']:+d} bytes, "
+            f"and profiled launches {invariant_dynamic['kernel_launch_count'] - native_dynamic['kernel_launch_count']:+d} "
+            f"({native_dynamic['kernel_launch_count']} to {invariant_dynamic['kernel_launch_count']})."
+        )
     else:
         lines.append("Complete-policy timings unavailable.")
 
