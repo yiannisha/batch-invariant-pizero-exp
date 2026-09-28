@@ -147,16 +147,41 @@ def heldout_flow_figure(records_path: Path, output: Path, summary_path: Path) ->
 def serving_figure(summary_path: Path, output: Path) -> None:
     summaries = json.loads(summary_path.read_text())
     fig, axis = plt.subplots(figsize=(6.4, 4.0))
+    grouped = defaultdict(list)
     for record in summaries:
-        style = "o" if record["numerical_contract_satisfied"] else "x"
-        axis.scatter(
-            record["throughput_requests_per_second"],
-            record["p95_arrival_to_completion_ms"],
-            marker=style,
-            label=f"{record['configuration']} @ {record['offered_load']}",
+        grouped[record["configuration"]].append(record)
+    for configuration, records in sorted(grouped.items()):
+        records.sort(key=lambda item: item["offered_load"])
+        contract_states = {
+            item["numerical_contract_satisfied"] for item in records
+        }
+        contract_label = (
+            "pass" if contract_states == {True}
+            else "fail" if contract_states == {False}
+            else "mixed"
         )
+        style = "o" if contract_label == "pass" else "X"
+        line = axis.plot(
+            [item["throughput_requests_per_second"] for item in records],
+            [item["p95_arrival_to_completion_ms"] for item in records],
+            marker=style,
+            label=f"{configuration} (contract {contract_label})",
+        )
+        for item in records:
+            axis.annotate(
+                f"load={item['offered_load']:g}",
+                (
+                    item["throughput_requests_per_second"],
+                    item["p95_arrival_to_completion_ms"],
+                ),
+                xytext=(4, 4),
+                textcoords="offset points",
+                fontsize=6,
+                color=line[0].get_color(),
+            )
     axis.set_xlabel("Throughput (requests/s)")
     axis.set_ylabel("p95 arrival-to-completion latency (ms)")
+    axis.set_title("Serving tradeoff by offered load")
     axis.legend(fontsize=7)
     axis.grid(alpha=0.25)
     fig.tight_layout()
