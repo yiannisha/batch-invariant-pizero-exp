@@ -60,6 +60,33 @@ def policy_summary(records: list[dict]) -> dict[str, dict]:
     return result
 
 
+def flow_step_summary(records: list[dict], implementation: str) -> dict[int, dict]:
+    grouped = defaultdict(list)
+    exact = defaultdict(int)
+    counts = defaultdict(int)
+    for record in records:
+        if record["implementation"] != implementation or record["batch_size"] == 1:
+            continue
+        for comparison in record.get("preclip_and_flow", []):
+            match = FLOW.match(comparison["trace_key"])
+            if not match:
+                continue
+            step = int(match.group(1)) + 1
+            grouped[step].append(comparison["max_absolute_error"])
+            exact[step] += int(comparison["exact"])
+            counts[step] += 1
+    return {
+        step: {
+            "comparisons": counts[step],
+            "exact": exact[step],
+            "median": statistics.median(values),
+            "p95": percentile(values, 0.95),
+            "maximum": max(values),
+        }
+        for step, values in sorted(grouped.items())
+    }
+
+
 def main() -> None:
     environment = load_json(RESULTS / "environment.json", {})
     freeze = load_json(RESULTS / "numerical_freeze.json", {})
@@ -78,11 +105,14 @@ def main() -> None:
     local_explicit = load_json(RESULTS / "diagnostic" / "local_replay_explicit_o_proj.json")
     local_full = load_json(RESULTS / "diagnostic" / "local_replay_full_o_proj.json")
     fidelity = load_json(RESULTS / "diagnostic" / "singleton_fidelity.json")
+    heldout_fidelity = load_jsonl(RESULTS / "heldout" / "singleton_fidelity.jsonl")
     operator = load_jsonl(RESULTS / "operator" / "raw.jsonl")
     dispatch = load_json(RESULTS / "operator" / "dispatch_report.json", [])
     kernel = load_json(RESULTS / "performance" / "kernel_summary.json", [])
     policy_perf = load_json(RESULTS / "performance" / "policy_summary.json", [])
     serving = load_json(RESULTS / "serving" / "summary.json", [])
+    simpler_episodes = load_jsonl(RESULTS / "simpler" / "episodes.jsonl")
+    simpler_summary = load_json(RESULTS / "simpler" / "summary.json", {})
     simpler_blocker = load_json(RESULTS / "simpler" / "blocker.json")
 
     lines = [
@@ -185,7 +215,17 @@ def main() -> None:
         )
 
     lines += ["", "## C. How do differences propagate through the flow solver?", ""]
-    if trace:
+    if heldout:
+        for implementation in ("native", "full_invariant"):
+            steps = flow_step_summary(heldout, implementation)
+            lines.append(f"- `{implementation}`:")
+            for step, values in steps.items():
+                lines.append(
+                    f"  - step {step}: exact {values['exact']}/{values['comparisons']}, "
+                    f"median={fmt(values['median'])}, p95={fmt(values['p95'])}, "
+                    f"maximum={fmt(values['maximum'])}."
+                )
+    elif trace:
         for implementation in (
             "native", "existing_invariant_ops", "invariant_plus_patch_projection", "full_invariant"
         ):
@@ -222,7 +262,17 @@ def main() -> None:
         lines.append("Unavailable.")
 
     lines += ["", "## E. How faithful is invariant singleton inference to native singleton inference?", ""]
-    if fidelity:
+    if heldout_fidelity:
+        values = [item["normalized"] for item in heldout_fidelity]
+        errors = [item["max_absolute_error"] for item in values]
+        lines.append(
+            f"Across {len(values)} held-out request/noise pairs, "
+            f"{sum(item['exact'] for item in values)} were bit-identical. Maximum absolute "
+            f"error={fmt(max(errors))}, median={fmt(statistics.median(errors))}, "
+            f"p95={fmt(percentile(errors, 0.95))}. This patched-vs-native singleton "
+            "comparison is distinct from request-level batch invariance."
+        )
+    elif fidelity:
         item = fidelity["metrics"]
         lines.append(
             f"For the frozen synthetic diagnostic singleton: exact={item['exact']}, "
@@ -239,7 +289,31 @@ def main() -> None:
             f"- Action divergence: measured in the {scope} numerical campaign; "
             f"{native['arrangement_violations']}/{native['arrangements']} native arrangements differed."
         )
-    if simpler_blocker:
+    if simpler_episodes and simpler_summary:
+        lines.append(
+            f"The paired closed-loop campaign completed {len(simpler_episodes)}/800 episodes."
+        )
+        for task, result in sorted(simpler_summary["tasks"].items()):
+            rates = result["success_rate"]
+            lines.append(
+                f"- `{task}` success rates: native singleton={rates['native_singleton']:.3f}, "
+                f"native dynamic={rates['native_dynamic']:.3f}, patched singleton="
+                f"{rates['patched_singleton']:.3f}, patched dynamic="
+                f"{rates['patched_dynamic']:.3f}."
+            )
+            for comparison, values in result["paired_differences"].items():
+                lines.append(
+                    f"  - `{comparison}`: paired estimate={values['estimate']:.3f}, "
+                    f"95% bootstrap CI=[{values['ci95'][0]:.3f}, {values['ci95'][1]:.3f}], "
+                    f"disagreements={values['disagreement_count']}/{result['episodes']}."
+                )
+            for comparison, values in result["trajectory_pairs"].items():
+                lines.append(
+                    f"  - `{comparison}` trajectory maxima: position="
+                    f"{fmt(max(item['end_effector_position_max_m'] for item in values))} m, "
+                    f"rotation={fmt(max(item['end_effector_rotation_max_rad'] for item in values))} rad."
+                )
+    elif simpler_blocker:
         lines += [
             "- Trajectory divergence: unavailable; no SIMPLER episode could reach `env.reset`.",
             "- Paired success disagreement: unavailable; 0/800 planned episodes were executed.",

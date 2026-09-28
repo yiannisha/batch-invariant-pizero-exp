@@ -144,10 +144,16 @@ def simpler_rows(records: list[dict]) -> list[dict]:
         rows.append(
             {
                 "Task": task.replace("_", " ").title(),
+                "Native singleton success": statistics.mean(by_condition["native_singleton"]) if by_condition["native_singleton"] else "NA",
                 "Native dynamic success": statistics.mean(by_condition["native_dynamic"]) if by_condition["native_dynamic"] else "NA",
+                "Patched singleton success": statistics.mean(by_condition["patched_singleton"]) if by_condition["patched_singleton"] else "NA",
                 "Patched dynamic success": statistics.mean(by_condition["patched_dynamic"]) if by_condition["patched_dynamic"] else "NA",
                 "Native paired disagreements": sum(native_single.get(key) != value for key, value in native_dynamic.items()),
                 "Patched paired disagreements": sum(patched_single.get(key) != value for key, value in patched_dynamic.items()),
+                "Patched-vs-native singleton disagreements": sum(
+                    native_single.get(key) != value
+                    for key, value in patched_single.items()
+                ),
             }
         )
     return rows

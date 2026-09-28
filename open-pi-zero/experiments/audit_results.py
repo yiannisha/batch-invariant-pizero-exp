@@ -38,6 +38,86 @@ def policy_audit(path: Path, expected: int) -> dict:
     }
 
 
+def heldout_audit(path: Path, fidelity_path: Path, freeze: dict) -> dict:
+    records = jsonl(path)
+    fidelity = jsonl(fidelity_path)
+    assert len(records) == 110_400, (path, len(records), 110_400)
+    assert len(fidelity) == 2_400, (fidelity_path, len(fidelity), 2_400)
+    assert len({item["request_id"] for item in records}) == 2_400
+    assert len({item["request_id"] for item in fidelity}) == 2_400
+    groups = defaultdict(list)
+    by_implementation = defaultdict(list)
+    for item in records:
+        assert item["numerical_policy_sha"] == freeze["batch_invariant_pizero_sha"]
+        assert item["batch_invariant_ops_sha"] == freeze["batch_invariant_ops_sha"]
+        assert item["checkpoint_sha256"] == freeze["checkpoint"]["sha256"]
+        groups[(item["request_id"], item["implementation"])].append(item)
+        if item["batch_size"] > 1:
+            by_implementation[item["implementation"]].append(item)
+    assert len(groups) == 4_800
+    assert all(len(items) == 23 for items in groups.values())
+    full = by_implementation["full_invariant"]
+    assert len(full) == 52_800
+    assert all(item["output"]["exact"] for item in full)
+    return {
+        "arrangement_records": len(records),
+        "fixed_request_noise_pairs": len(fidelity),
+        "implementations": {
+            name: {
+                "nonsingleton_arrangements": len(items),
+                "violations": sum(not item["output"]["exact"] for item in items),
+                "maximum_error": max(
+                    item["output"]["max_absolute_error"] for item in items
+                ),
+            }
+            for name, items in sorted(by_implementation.items())
+        },
+        "singleton_fidelity_exact": sum(
+            item["normalized"]["exact"] for item in fidelity
+        ),
+        "singleton_fidelity_maximum_error": max(
+            item["normalized"]["max_absolute_error"] for item in fidelity
+        ),
+    }
+
+
+def simpler_audit(path: Path, summary_path: Path, freeze: dict) -> dict:
+    episodes = jsonl(path)
+    assert len(episodes) == 800, (path, len(episodes), 800)
+    keys = {
+        (item["task"], item["initialization_id"], item["condition"])
+        for item in episodes
+    }
+    assert len(keys) == 800
+    assert {item["task"] for item in episodes} == {
+        "pick_can", "move_near", "open_drawer", "close_drawer",
+    }
+    assert {item["condition"] for item in episodes} == {
+        "native_singleton", "native_dynamic",
+        "patched_singleton", "patched_dynamic",
+    }
+    assert all(
+        item["numerical_policy_sha"] == freeze["batch_invariant_pizero_sha"]
+        and item["batch_invariant_ops_sha"] == freeze["batch_invariant_ops_sha"]
+        and item["checkpoint_sha256"] == freeze["checkpoint"]["sha256"]
+        for item in episodes
+    )
+    summary = json.loads(summary_path.read_text())
+    assert summary["bootstrap"] == {
+        "seed": 20250401,
+        "resamples": 10000,
+        "unit": "matched episode initialization",
+    }
+    assert set(summary["tasks"]) == {item["task"] for item in episodes}
+    assert all(item["episodes"] == 50 for item in summary["tasks"].values())
+    return {
+        "episodes": len(episodes),
+        "matched_initializations_per_task": 50,
+        "conditions": 4,
+        "bootstrap": summary["bootstrap"],
+    }
+
+
 def main() -> None:
     operator = jsonl(RESULTS / "operator" / "raw.jsonl")
     assert len(operator) == 72_000
@@ -87,9 +167,30 @@ def main() -> None:
     assert len(serving_summary) == 20
 
     environment = json.loads((RESULTS / "environment.json").read_text())
+    rtx_environment = json.loads((RESULTS / "rtx_environment.json").read_text())
     freeze = json.loads((RESULTS / "numerical_freeze.json").read_text())
     assert freeze["numerical_implementation_frozen"] and not freeze["dirty_status"]
-    assert (RESULTS / "simpler" / "blocker.json").exists()
+    replay = json.loads((RESULTS / "replay_manifest.json").read_text())
+    assert replay["counts"] == {
+        "episodes": 100,
+        "observations": 1000,
+        "diagnostic_observations": 200,
+        "heldout_observations": 800,
+        "request_noise_pairs": 3000,
+    }
+    assert replay["provenance"]["checkpoint_sha256"] == freeze["checkpoint"]["sha256"]
+    assert all(Path(item["tensor_path"]).is_file() for item in replay["observations"])
+    heldout = heldout_audit(
+        RESULTS / "heldout" / "invariance.jsonl",
+        RESULTS / "heldout" / "singleton_fidelity.jsonl",
+        freeze,
+    )
+    simpler = simpler_audit(
+        RESULTS / "simpler" / "episodes.jsonl",
+        RESULTS / "simpler" / "summary.json",
+        freeze,
+    )
+    historical_blocker = json.loads((RESULTS / "simpler" / "blocker.json").read_text())
     for relative in (
         "artifacts/figures/flow_step_propagation.png",
         "artifacts/figures/serving_tradeoff.png",
@@ -100,7 +201,7 @@ def main() -> None:
     audit = {
         "schema_version": 1,
         "audited_at": utc_timestamp(),
-        "status": "all_runnable_campaigns_verified",
+        "status": "complete_campaign_verified",
         "operator": {
             "records": len(operator),
             "configurations": len(operator_groups),
@@ -124,7 +225,10 @@ def main() -> None:
             "full_invariant_transformation_failures": sum(
                 not item["output"]["exact"] for item in full_transformations
             ),
+            "heldout": heldout,
         },
+        "replay": replay["counts"],
+        "simpler": simpler,
         "performance": {
             "kernel_timing_samples": len(kernel),
             "policy_timing_samples": len(policy_timing),
@@ -136,8 +240,10 @@ def main() -> None:
             "numerical_policy_sha": freeze["batch_invariant_pizero_sha"],
             "operator_sha": freeze["batch_invariant_ops_sha"],
             "checkpoint_sha256": freeze["checkpoint"]["sha256"],
+            "rtx_environment_policy_sha": rtx_environment["repositories"]["batch_invariant_pizero"]["git_sha"],
+            "rtx_runtime_operator_sha": rtx_environment["repositories"]["batch_invariant_ops"]["git_sha"],
         },
-        "blocked": json.loads((RESULTS / "simpler" / "blocker.json").read_text()),
+        "historical_h100_simulator_blocker": historical_blocker,
     }
     write_json(RESULTS / "audit.json", audit)
     print(RESULTS / "audit.json")
