@@ -10,3 +10,11 @@ repomix-output.xml
 # Experiment outputs and local tooling
 batch_invariance_results.json
 .DS_Store
+
+# Workspace-only orchestration and transfer state
+.runtime/
+rollout-*.jsonl
+
+# Pristine upstream checkout used for comparison. The experiment implementation
+# and the exact operator source used by the campaign are versioned in this repo.
+upstream-open-pi-zero/

@@ -1,4 +1,4 @@
-# Batch-invariant PiZero
+# Batch-invariant PiZero experiments
 
 This repository studies a subtle inference failure mode: the output for one
 example can change when unrelated examples are added to the same batch. It
@@ -14,19 +14,35 @@ are retained alongside the measurements.
 
 ## Repository map
 
+- `PLAN.md` — the prespecified campaign plan and append-only execution log.
+- `batch_invariant_ops/` — the exact CUDA/Triton operator source used by the
+  completed campaign, including the RTX launch adaptation.
 - `open-pi-zero/` — the PiZero implementation and reproducible experiment.
-- `open-pi-zero/batch_invariant_ops/` — the operator shim and focused tests.
 - `open-pi-zero/experiments/` — pretrained campaign runners, analysis,
   artifact generation, and the exact final audit.
 - `open-pi-zero/results/` — machine-readable measurements and generated report.
 - `open-pi-zero/artifacts/` — generated tables and figures.
 - `open-pi-zero/scripts/run_sample.py` — compares a fixed sample alone with
   that sample at index zero in larger batches and records intermediate errors.
-- `custom_conv2d.py` — standalone reference/Triton Conv2d experiment.
 
 External checkpoints, replay tensors, and SIMPLER assets are not vendored.
 Their hashes/revisions and the commands that consume them are retained in the
 experiment results and runbook.
+
+The completed result set is committed, including deterministic compressed
+archives of the large held-out and SIMPLER raw records. The corresponding
+uncompressed JSONL files remain intentionally untracked; their SHA-256 hashes
+and record counts are recorded in
+[`open-pi-zero/results/archive_manifest.json`](open-pi-zero/results/archive_manifest.json).
+
+## Read the results
+
+The paper-facing result narrative is in
+[`open-pi-zero/results/EXPERIMENT_REPORT.md`](open-pi-zero/results/EXPERIMENT_REPORT.md).
+The machine-readable completion gate is
+[`open-pi-zero/results/audit.json`](open-pi-zero/results/audit.json), whose
+status is `complete_campaign_verified`. Generated tables and figures are under
+[`open-pi-zero/artifacts/`](open-pi-zero/artifacts/).
 
 ## Run the lightweight sample
 
@@ -61,7 +77,9 @@ for the experiment protocol, interpretation, and known limitations.
 ## Reproduce the pretrained campaign
 
 The full campaign has stricter checkpoint, environment, diagnostic/freeze,
-held-out, paired-behavior, and artifact gates. See
+held-out, paired-behavior, and artifact gates. The operator dependency is
+already present at the repository root in the path expected by
+`open-pi-zero/pyproject.toml`. See
 [`open-pi-zero/experiments/README.md`](open-pi-zero/experiments/README.md) for
 the exact sequence and external asset requirements. The generated answers to
 the experiment's A–H research questions are in
