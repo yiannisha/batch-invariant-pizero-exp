@@ -126,6 +126,7 @@ def main() -> None:
     serving = load_json(RESULTS / "serving" / "summary.json", [])
     simpler_episodes = load_jsonl(RESULTS / "simpler" / "episodes.jsonl")
     simpler_summary = load_json(RESULTS / "simpler" / "summary.json", {})
+    simpler_reset_audit = load_json(RESULTS / "simpler" / "reset_audit.json", {})
     simpler_runtime = load_json(RESULTS / "simpler" / "runtime.json", {})
     simpler_blocker = load_json(RESULTS / "simpler" / "blocker.json")
 
@@ -366,6 +367,64 @@ def main() -> None:
             "simulator-native units. States are aligned by step index through the shorter "
             "trajectory, and terminal denotes the last state of that aligned prefix."
         )
+        if simpler_reset_audit:
+            resets = simpler_reset_audit["tasks"]
+            pick_pose = resets["pick_can"]["pose_fields"][
+                "obj_init_pose_wrt_robot_base"
+            ]
+            move_source = resets["move_near"]["pose_fields"][
+                "episode_source_obj_init_pose_wrt_robot_base"
+            ]
+            move_target = resets["move_near"]["pose_fields"][
+                "episode_target_obj_init_pose_wrt_robot_base"
+            ]
+            lines.append(
+                "Reset-pairing qualification: all four conditions used the same indexed "
+                "seed, static reset fields matched in 50/50 blocks for every task, and the "
+                "recorded initial robot/end-effector state was bit-identical in 50/50 blocks "
+                "for every task. Returned raw reset records were byte-identical in "
+                f"{resets['pick_can']['raw_reset_info_exact_blocks']}/50 `pick_can`, "
+                f"{resets['move_near']['raw_reset_info_exact_blocks']}/50 `move_near`, "
+                f"{resets['open_drawer']['raw_reset_info_exact_blocks']}/50 `open_drawer`, "
+                f"and {resets['close_drawer']['raw_reset_info_exact_blocks']}/50 "
+                "`close_drawer` blocks."
+            )
+            lines.append(
+                "The non-exact object-task records contain small returned post-reset object-"
+                "pose differences. For `pick_can`, maximum within-block pairwise translation "
+                "variation had median/p95/maximum "
+                f"{fmt(pick_pose['maximum_pairwise_translation_m']['median'])}/"
+                f"{fmt(pick_pose['maximum_pairwise_translation_m']['p95'])}/"
+                f"{fmt(pick_pose['maximum_pairwise_translation_m']['maximum'])} m, and "
+                "rotation variation had median/p95/maximum "
+                f"{fmt(pick_pose['maximum_pairwise_rotation_rad']['median'])}/"
+                f"{fmt(pick_pose['maximum_pairwise_rotation_rad']['p95'])}/"
+                f"{fmt(pick_pose['maximum_pairwise_rotation_rad']['maximum'])} rad."
+            )
+            lines.append(
+                "For `move_near`, the corresponding source-object translation and rotation "
+                "median/p95/maximum values were "
+                f"{fmt(move_source['maximum_pairwise_translation_m']['median'])}/"
+                f"{fmt(move_source['maximum_pairwise_translation_m']['p95'])}/"
+                f"{fmt(move_source['maximum_pairwise_translation_m']['maximum'])} m and "
+                f"{fmt(move_source['maximum_pairwise_rotation_rad']['median'])}/"
+                f"{fmt(move_source['maximum_pairwise_rotation_rad']['p95'])}/"
+                f"{fmt(move_source['maximum_pairwise_rotation_rad']['maximum'])} rad; the "
+                "target-object values were "
+                f"{fmt(move_target['maximum_pairwise_translation_m']['median'])}/"
+                f"{fmt(move_target['maximum_pairwise_translation_m']['p95'])}/"
+                f"{fmt(move_target['maximum_pairwise_translation_m']['maximum'])} m and "
+                f"{fmt(move_target['maximum_pairwise_rotation_rad']['median'])}/"
+                f"{fmt(move_target['maximum_pairwise_rotation_rad']['p95'])}/"
+                f"{fmt(move_target['maximum_pairwise_rotation_rad']['maximum'])} rad."
+            )
+            lines.append(
+                "Accordingly, object-task estimates are observed end-to-end effects under "
+                "repeated same-seed scene construction and retain post-reset physics "
+                "nondeterminism as a disclosed confound; the two drawer tasks had exact "
+                "returned resets and do not carry that qualification. Full per-initialization "
+                "evidence is retained in `results/simpler/reset_audit.json`."
+            )
         for task, result in sorted(simpler_summary["tasks"].items()):
             rates = result["success_rate"]
             lines.append(

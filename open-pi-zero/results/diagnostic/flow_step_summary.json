@@ -1,0 +1,235 @@
+{
+  "central_statistic": "mean absolute error across action-state elements",
+  "implementations": {
+    "existing_invariant_ops": {
+      "0": {
+        "exact": true,
+        "maximum_absolute_error": 0.0,
+        "mean_absolute_error": 0.0
+      },
+      "1": {
+        "exact": false,
+        "maximum_absolute_error": 1.1920928955078125e-07,
+        "mean_absolute_error": 2.9802322387695312e-08
+      },
+      "10": {
+        "exact": false,
+        "maximum_absolute_error": 2.2798776626586914e-06,
+        "mean_absolute_error": 5.673084940229143e-07
+      },
+      "2": {
+        "exact": false,
+        "maximum_absolute_error": 3.5762786865234375e-07,
+        "mean_absolute_error": 9.878671595028468e-08
+      },
+      "3": {
+        "exact": false,
+        "maximum_absolute_error": 4.76837158203125e-07,
+        "mean_absolute_error": 1.5320256352424622e-07
+      },
+      "4": {
+        "exact": false,
+        "maximum_absolute_error": 5.960464477539062e-07,
+        "mean_absolute_error": 2.101795481784003e-07
+      },
+      "5": {
+        "exact": false,
+        "maximum_absolute_error": 7.748603820800781e-07,
+        "mean_absolute_error": 2.640964729445321e-07
+      },
+      "6": {
+        "exact": false,
+        "maximum_absolute_error": 1.0728836059570312e-06,
+        "mean_absolute_error": 3.227032721042633e-07
+      },
+      "7": {
+        "exact": false,
+        "maximum_absolute_error": 1.1324882507324219e-06,
+        "mean_absolute_error": 3.824908552425248e-07
+      },
+      "8": {
+        "exact": false,
+        "maximum_absolute_error": 1.1920928955078125e-06,
+        "mean_absolute_error": 4.2242131062916345e-07
+      },
+      "9": {
+        "exact": false,
+        "maximum_absolute_error": 1.6093254089355469e-06,
+        "mean_absolute_error": 4.4068188539573126e-07
+      }
+    },
+    "full_invariant": {
+      "0": {
+        "exact": true,
+        "maximum_absolute_error": 0.0,
+        "mean_absolute_error": 0.0
+      },
+      "1": {
+        "exact": true,
+        "maximum_absolute_error": 0.0,
+        "mean_absolute_error": 0.0
+      },
+      "10": {
+        "exact": true,
+        "maximum_absolute_error": 0.0,
+        "mean_absolute_error": 0.0
+      },
+      "2": {
+        "exact": true,
+        "maximum_absolute_error": 0.0,
+        "mean_absolute_error": 0.0
+      },
+      "3": {
+        "exact": true,
+        "maximum_absolute_error": 0.0,
+        "mean_absolute_error": 0.0
+      },
+      "4": {
+        "exact": true,
+        "maximum_absolute_error": 0.0,
+        "mean_absolute_error": 0.0
+      },
+      "5": {
+        "exact": true,
+        "maximum_absolute_error": 0.0,
+        "mean_absolute_error": 0.0
+      },
+      "6": {
+        "exact": true,
+        "maximum_absolute_error": 0.0,
+        "mean_absolute_error": 0.0
+      },
+      "7": {
+        "exact": true,
+        "maximum_absolute_error": 0.0,
+        "mean_absolute_error": 0.0
+      },
+      "8": {
+        "exact": true,
+        "maximum_absolute_error": 0.0,
+        "mean_absolute_error": 0.0
+      },
+      "9": {
+        "exact": true,
+        "maximum_absolute_error": 0.0,
+        "mean_absolute_error": 0.0
+      }
+    },
+    "invariant_plus_patch_projection": {
+      "0": {
+        "exact": true,
+        "maximum_absolute_error": 0.0,
+        "mean_absolute_error": 0.0
+      },
+      "1": {
+        "exact": false,
+        "maximum_absolute_error": 1.1920928955078125e-07,
+        "mean_absolute_error": 2.9802322387695312e-08
+      },
+      "10": {
+        "exact": false,
+        "maximum_absolute_error": 2.2798776626586914e-06,
+        "mean_absolute_error": 5.673084940229143e-07
+      },
+      "2": {
+        "exact": false,
+        "maximum_absolute_error": 3.5762786865234375e-07,
+        "mean_absolute_error": 9.878671595028468e-08
+      },
+      "3": {
+        "exact": false,
+        "maximum_absolute_error": 4.76837158203125e-07,
+        "mean_absolute_error": 1.5320256352424622e-07
+      },
+      "4": {
+        "exact": false,
+        "maximum_absolute_error": 5.960464477539062e-07,
+        "mean_absolute_error": 2.101795481784003e-07
+      },
+      "5": {
+        "exact": false,
+        "maximum_absolute_error": 7.748603820800781e-07,
+        "mean_absolute_error": 2.640964729445321e-07
+      },
+      "6": {
+        "exact": false,
+        "maximum_absolute_error": 1.0728836059570312e-06,
+        "mean_absolute_error": 3.227032721042633e-07
+      },
+      "7": {
+        "exact": false,
+        "maximum_absolute_error": 1.1324882507324219e-06,
+        "mean_absolute_error": 3.824908552425248e-07
+      },
+      "8": {
+        "exact": false,
+        "maximum_absolute_error": 1.1920928955078125e-06,
+        "mean_absolute_error": 4.2242131062916345e-07
+      },
+      "9": {
+        "exact": false,
+        "maximum_absolute_error": 1.6093254089355469e-06,
+        "mean_absolute_error": 4.4068188539573126e-07
+      }
+    },
+    "native": {
+      "0": {
+        "exact": true,
+        "maximum_absolute_error": 0.0,
+        "mean_absolute_error": 0.0
+      },
+      "1": {
+        "exact": false,
+        "maximum_absolute_error": 5.960464477539063e-08,
+        "mean_absolute_error": 2.3648941091128758e-08
+      },
+      "10": {
+        "exact": false,
+        "maximum_absolute_error": 4.470348358154297e-07,
+        "mean_absolute_error": 1.1999093528304782e-07
+      },
+      "2": {
+        "exact": false,
+        "maximum_absolute_error": 1.1920928955078125e-07,
+        "mean_absolute_error": 5.26862485068185e-08
+      },
+      "3": {
+        "exact": false,
+        "maximum_absolute_error": 1.7881393432617188e-07,
+        "mean_absolute_error": 7.34081757920129e-08
+      },
+      "4": {
+        "exact": false,
+        "maximum_absolute_error": 2.5331974029541016e-07,
+        "mean_absolute_error": 1.0068262262003763e-07
+      },
+      "5": {
+        "exact": false,
+        "maximum_absolute_error": 2.8312206268310547e-07,
+        "mean_absolute_error": 1.269924853529249e-07
+      },
+      "6": {
+        "exact": false,
+        "maximum_absolute_error": 3.129243850708008e-07,
+        "mean_absolute_error": 1.4457119894879205e-07
+      },
+      "7": {
+        "exact": false,
+        "maximum_absolute_error": 3.427267074584961e-07,
+        "mean_absolute_error": 1.6078619020325797e-07
+      },
+      "8": {
+        "exact": false,
+        "maximum_absolute_error": 3.5762786865234375e-07,
+        "mean_absolute_error": 1.6301471207823071e-07
+      },
+      "9": {
+        "exact": false,
+        "maximum_absolute_error": 3.5762786865234375e-07,
+        "mean_absolute_error": 1.4455456818853107e-07
+      }
+    }
+  },
+  "scope": "single frozen B=2 diverse diagnostic arrangement",
+  "tail_statistic": "maximum absolute error across action-state elements"
+}

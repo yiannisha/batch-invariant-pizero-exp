@@ -3,9 +3,13 @@ temp/
 .ruff_cache/
 launch/
 logs/
-# Raw measurements and summaries are experiment deliverables.  Large replay
-# tensors and external checkpoints stay outside git.
+# Raw JSONLs remain local; deterministic archives, summaries, and manifests are
+# experiment deliverables. Large replay tensors and external checkpoints stay
+# outside git.
 results/replay/tensors/
+results/heldout/invariance.jsonl
+results/heldout/singleton_fidelity.jsonl
+results/simpler/episodes.jsonl
 checkpoints/
 wandb/
 *.mp4

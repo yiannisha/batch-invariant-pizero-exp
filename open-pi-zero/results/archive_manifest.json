@@ -1,0 +1,53 @@
+{
+  "archives": [
+    {
+      "archive": "results/heldout/invariance.jsonl.gz",
+      "compressed": {
+        "sha256": "7f801503424ae8640e5b181bb1af61507014e815c788dfe281b4066ee09822ae",
+        "size_bytes": 41271217
+      },
+      "compression_level": 6,
+      "format": "gzip",
+      "gzip_mtime": 0,
+      "raw": {
+        "line_count": 110400,
+        "sha256": "e337116406c4a7d641cd03c160c045a1520cb5046ed4a200028924619bfcb241",
+        "size_bytes": 1528642281
+      },
+      "source": "results/heldout/invariance.jsonl"
+    },
+    {
+      "archive": "results/heldout/singleton_fidelity.jsonl.gz",
+      "compressed": {
+        "sha256": "6d6f5e70d223707874dc74f146355fc2c400ec4d4d72cc4f42cf309e7239f3f4",
+        "size_bytes": 574474
+      },
+      "compression_level": 6,
+      "format": "gzip",
+      "gzip_mtime": 0,
+      "raw": {
+        "line_count": 2400,
+        "sha256": "5cca18880e387e8102e7fb957176969e1b8ddc3d5cce50241ee8b0d09d97f1ea",
+        "size_bytes": 5175747
+      },
+      "source": "results/heldout/singleton_fidelity.jsonl"
+    },
+    {
+      "archive": "results/simpler/episodes.jsonl.gz",
+      "compressed": {
+        "sha256": "f9444145f1e44c063245d10bca266362ec79a12f2125dcac800d7074e25b2e0f",
+        "size_bytes": 34355187
+      },
+      "compression_level": 6,
+      "format": "gzip",
+      "gzip_mtime": 0,
+      "raw": {
+        "line_count": 800,
+        "sha256": "0caa7b7e33b89f8d8acf9e580e836904aece750eebb321d26e677f050345d59f",
+        "size_bytes": 126932185
+      },
+      "source": "results/simpler/episodes.jsonl"
+    }
+  ],
+  "schema_version": 1
+}

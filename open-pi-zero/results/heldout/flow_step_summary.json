@@ -1,0 +1,146 @@
+{
+  "full_invariant": {
+    "1": {
+      "comparisons": 50400,
+      "exact": 50400,
+      "maximum_absolute_error": 0.0,
+      "median_max_absolute_error": 0.0,
+      "p95_max_absolute_error": 0.0
+    },
+    "10": {
+      "comparisons": 50400,
+      "exact": 50400,
+      "maximum_absolute_error": 0.0,
+      "median_max_absolute_error": 0.0,
+      "p95_max_absolute_error": 0.0
+    },
+    "2": {
+      "comparisons": 50400,
+      "exact": 50400,
+      "maximum_absolute_error": 0.0,
+      "median_max_absolute_error": 0.0,
+      "p95_max_absolute_error": 0.0
+    },
+    "3": {
+      "comparisons": 50400,
+      "exact": 50400,
+      "maximum_absolute_error": 0.0,
+      "median_max_absolute_error": 0.0,
+      "p95_max_absolute_error": 0.0
+    },
+    "4": {
+      "comparisons": 50400,
+      "exact": 50400,
+      "maximum_absolute_error": 0.0,
+      "median_max_absolute_error": 0.0,
+      "p95_max_absolute_error": 0.0
+    },
+    "5": {
+      "comparisons": 50400,
+      "exact": 50400,
+      "maximum_absolute_error": 0.0,
+      "median_max_absolute_error": 0.0,
+      "p95_max_absolute_error": 0.0
+    },
+    "6": {
+      "comparisons": 50400,
+      "exact": 50400,
+      "maximum_absolute_error": 0.0,
+      "median_max_absolute_error": 0.0,
+      "p95_max_absolute_error": 0.0
+    },
+    "7": {
+      "comparisons": 50400,
+      "exact": 50400,
+      "maximum_absolute_error": 0.0,
+      "median_max_absolute_error": 0.0,
+      "p95_max_absolute_error": 0.0
+    },
+    "8": {
+      "comparisons": 50400,
+      "exact": 50400,
+      "maximum_absolute_error": 0.0,
+      "median_max_absolute_error": 0.0,
+      "p95_max_absolute_error": 0.0
+    },
+    "9": {
+      "comparisons": 50400,
+      "exact": 50400,
+      "maximum_absolute_error": 0.0,
+      "median_max_absolute_error": 0.0,
+      "p95_max_absolute_error": 0.0
+    }
+  },
+  "native": {
+    "1": {
+      "comparisons": 50400,
+      "exact": 0,
+      "maximum_absolute_error": 0.00018906593322753906,
+      "median_max_absolute_error": 1.1920928955078125e-07,
+      "p95_max_absolute_error": 2.6946514844893954e-05
+    },
+    "10": {
+      "comparisons": 50400,
+      "exact": 0,
+      "maximum_absolute_error": 0.14864274859428406,
+      "median_max_absolute_error": 7.450580596923828e-07,
+      "p95_max_absolute_error": 0.0002191588282585144
+    },
+    "2": {
+      "comparisons": 50400,
+      "exact": 0,
+      "maximum_absolute_error": 0.00038492679595947266,
+      "median_max_absolute_error": 2.384185791015625e-07,
+      "p95_max_absolute_error": 5.310121923685001e-05
+    },
+    "3": {
+      "comparisons": 50400,
+      "exact": 0,
+      "maximum_absolute_error": 0.0005972683429718018,
+      "median_max_absolute_error": 2.980232238769531e-07,
+      "p95_max_absolute_error": 7.939934730529733e-05
+    },
+    "4": {
+      "comparisons": 50400,
+      "exact": 0,
+      "maximum_absolute_error": 0.0008360594511032104,
+      "median_max_absolute_error": 3.5762786865234375e-07,
+      "p95_max_absolute_error": 0.00010535269975662218
+    },
+    "5": {
+      "comparisons": 50400,
+      "exact": 0,
+      "maximum_absolute_error": 0.0011219531297683716,
+      "median_max_absolute_error": 4.470348358154297e-07,
+      "p95_max_absolute_error": 0.0001320205628871908
+    },
+    "6": {
+      "comparisons": 50400,
+      "exact": 0,
+      "maximum_absolute_error": 0.0014740228652954102,
+      "median_max_absolute_error": 5.364418029785156e-07,
+      "p95_max_absolute_error": 0.00016061328351497445
+    },
+    "7": {
+      "comparisons": 50400,
+      "exact": 0,
+      "maximum_absolute_error": 0.0018573999404907227,
+      "median_max_absolute_error": 5.960464477539062e-07,
+      "p95_max_absolute_error": 0.00018071010708808866
+    },
+    "8": {
+      "comparisons": 50400,
+      "exact": 0,
+      "maximum_absolute_error": 0.002893894910812378,
+      "median_max_absolute_error": 6.854534149169922e-07,
+      "p95_max_absolute_error": 0.00021657347679137923
+    },
+    "9": {
+      "comparisons": 50400,
+      "exact": 0,
+      "maximum_absolute_error": 0.01003071665763855,
+      "median_max_absolute_error": 7.450580596923828e-07,
+      "p95_max_absolute_error": 0.0002449057996272958
+    }
+  }
+}

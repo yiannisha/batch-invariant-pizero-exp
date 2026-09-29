@@ -1,6 +1,14 @@
 {
-  "audited_at": "2026-09-27T23:11:29.290096+00:00",
-  "blocked": {
+  "archives": {
+    "archives": 3,
+    "compressed_size_bytes": 76200878,
+    "manifest": "results/archive_manifest.json",
+    "raw_records": 113600,
+    "raw_size_bytes": 1660750213,
+    "verified": true
+  },
+  "audited_at": "2026-09-29T03:26:51.908046+00:00",
+  "historical_h100_simulator_blocker": {
     "affected_campaigns": [
       "100-episode frozen replay collection",
       "800-episode paired closed-loop SIMPLER campaign"
@@ -76,6 +84,16 @@
       },
       "records": 114
     },
+    "diagnostic_flow_steps": {
+      "implementations": [
+        "existing_invariant_ops",
+        "full_invariant",
+        "invariant_plus_patch_projection",
+        "native"
+      ],
+      "scope": "single frozen B=2 diverse diagnostic arrangement",
+      "steps_per_implementation": 11
+    },
     "float32_b16_b32": {
       "implementations": {
         "existing_invariant_ops": {
@@ -147,14 +165,145 @@
       "records": 114
     },
     "full_invariant_transformation_failures": 0,
+    "heldout": {
+      "arrangement_records": 110400,
+      "fixed_request_noise_pairs": 2400,
+      "implementations": {
+        "full_invariant": {
+          "maximum_error": 0.0,
+          "nonsingleton_arrangements": 50400,
+          "violations": 0
+        },
+        "native": {
+          "maximum_error": 0.14864274859428406,
+          "nonsingleton_arrangements": 50400,
+          "violations": 50400
+        }
+      },
+      "singleton_fidelity_exact": 0,
+      "singleton_fidelity_maximum_error": 0.00029343366622924805
+    },
+    "heldout_flow_steps": {
+      "full_invariant": {
+        "comparisons_per_step": 50400,
+        "exact_per_step": [
+          50400,
+          50400,
+          50400,
+          50400,
+          50400,
+          50400,
+          50400,
+          50400,
+          50400,
+          50400
+        ],
+        "steps": 10
+      },
+      "native": {
+        "comparisons_per_step": 50400,
+        "exact_per_step": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "steps": 10
+      }
+    },
+    "rtx_diagnostic": {
+      "arrangement_records": 1104,
+      "fixed_request_noise_pairs": 24,
+      "implementations": {
+        "full_invariant": {
+          "arrangements": 552,
+          "maximum_error": 0.0,
+          "violations": 0
+        },
+        "native": {
+          "arrangements": 552,
+          "maximum_error": 0.00043824315071105957,
+          "violations": 504
+        }
+      },
+      "tasks": [
+        "close_drawer",
+        "move_near",
+        "open_drawer",
+        "pick_can"
+      ]
+    },
     "transformation_records": 20
   },
   "provenance": {
     "checkpoint_sha256": "1da40985d963ddf394fa63e7db5ddd4cd8082d5c6ce0b2a0cae56abd8b6ec0eb",
     "environment_policy_sha": "93826eda150b7069a5f07d9cbab7a862c1a83e58",
+    "heldout_evaluation_harness_sha": "e12fc62cc2afb8236dd7bf4176e385863e2286f9",
     "numerical_policy_sha": "a2576bbac02fca0ba1868843475f4a644835bdf1",
-    "operator_sha": "14dafb5fd84350dc796a96cbecb566ca6295593f"
+    "operator_sha": "14dafb5fd84350dc796a96cbecb566ca6295593f",
+    "rtx_environment_policy_sha": "1fe465be27a773e14b5f37f4c0a8c0a553b7ce53",
+    "rtx_runtime_operator_sha": "8fdbcada1401608622a07e1d35b645973deb905d",
+    "simpler_evaluation_harness_sha": "2414244c6c46c715f902b5a83c6f4487256b5c29"
+  },
+  "replay": {
+    "diagnostic_observations": 200,
+    "episodes": 100,
+    "heldout_observations": 800,
+    "observations": 1000,
+    "request_noise_pairs": 3000
   },
   "schema_version": 1,
-  "status": "all_runnable_campaigns_verified"
+  "simpler": {
+    "bootstrap": {
+      "resamples": 10000,
+      "seed": 20250401,
+      "unit": "matched episode initialization"
+    },
+    "conditions": 4,
+    "episodes": 800,
+    "matched_initializations_per_task": 50,
+    "paired_request_schedules_verified": true,
+    "runtime_provenance": {
+      "egl_loader_sha256": "875ecbb2a07d60e32216c9f102965abc1e9cc1da7789558e2e9b8b9c107e231d",
+      "evaluation_harness_sha": "2414244c6c46c715f902b5a83c6f4487256b5c29",
+      "maniskill2_real2sim_sha": "91d154bfd864577f8d2e80f3fc2f8b4d9df9ae5c",
+      "rtx_launch_adaptation_sha": "8fdbcada1401608622a07e1d35b645973deb905d",
+      "simpler_env_sha": "59ad9e1539042ed333fd8ebba1b0395f5662f0bd",
+      "tokenizer_sha256": "64516a95741d80f99eb0a1202f8dd703f0a5da46f76742804c53a60dbb354580",
+      "vulkan_icd_sha256": "8bf904abc1c5d6428a1f27cc5d4a3c9783d15231f17ce1ef8d25e9cab1f60d1c"
+    }
+  },
+  "simpler_reset_pairing": {
+    "qualification": "Object-task effects are observed end-to-end effects under repeated same-seed scene construction because returned post-reset object poses are not always byte-identical. Drawer-task reset records are exactly paired.",
+    "source_sha256": "0caa7b7e33b89f8d8acf9e580e836904aece750eebb321d26e677f050345d59f",
+    "tasks": {
+      "close_drawer": {
+        "initial_robot_eef_state_exact_blocks": 50,
+        "raw_reset_info_exact_blocks": 50,
+        "static_reset_fields_exact_blocks": 50
+      },
+      "move_near": {
+        "initial_robot_eef_state_exact_blocks": 50,
+        "raw_reset_info_exact_blocks": 3,
+        "static_reset_fields_exact_blocks": 50
+      },
+      "open_drawer": {
+        "initial_robot_eef_state_exact_blocks": 50,
+        "raw_reset_info_exact_blocks": 50,
+        "static_reset_fields_exact_blocks": 50
+      },
+      "pick_can": {
+        "initial_robot_eef_state_exact_blocks": 50,
+        "raw_reset_info_exact_blocks": 1,
+        "static_reset_fields_exact_blocks": 50
+      }
+    }
+  },
+  "status": "complete_campaign_verified"
 }

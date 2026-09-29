@@ -1,0 +1,2320 @@
+{
+  "generated_at": "2026-09-29T03:19:57.752329+00:00",
+  "method": {
+    "conditions": [
+      "native_singleton",
+      "native_dynamic",
+      "patched_singleton",
+      "patched_dynamic"
+    ],
+    "pairing_unit": "task and initialization_id",
+    "pose_rotation": "maximum 2*acos(abs(unit-quaternion dot product)) across the six condition pairs",
+    "pose_translation": "maximum Euclidean distance across the six condition pairs",
+    "qualification": "Object-task effects are observed end-to-end effects under repeated same-seed scene construction because returned post-reset object poses are not always byte-identical. Drawer-task reset records are exactly paired."
+  },
+  "schema_version": 1,
+  "source": {
+    "path": "results/simpler/episodes.jsonl",
+    "records": 800,
+    "sha256": "0caa7b7e33b89f8d8acf9e580e836904aece750eebb321d26e677f050345d59f",
+    "size_bytes": 126932185
+  },
+  "tasks": {
+    "close_drawer": {
+      "episodes": 200,
+      "initial_robot_eef_state_exact_blocks": 50,
+      "initialization_blocks": 50,
+      "outcome_discordant_blocks": 4,
+      "outcome_discordant_initialization_ids": [
+        4,
+        7,
+        20,
+        25
+      ],
+      "pose_fields": {
+        "cabinet_pose_wrt_robot_base": {
+          "byte_exact_blocks": 50,
+          "maximum_pairwise_rotation_rad": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "p95": 0.0
+          },
+          "maximum_pairwise_translation_m": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "p95": 0.0
+          },
+          "per_initialization": [
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 0,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 1,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 2,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 3,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 4,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 5,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 6,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 7,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 8,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 9,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 10,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 11,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 12,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 13,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 14,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 15,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 16,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 17,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 18,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 19,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 20,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 21,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 22,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 23,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 24,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 25,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 26,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 27,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 28,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 29,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 30,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 31,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 32,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 33,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 34,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 35,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 36,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 37,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 38,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 39,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 40,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 41,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 42,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 43,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 44,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 45,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 46,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 47,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 48,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 49,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            }
+          ]
+        },
+        "drawer_pose_wrt_robot_base": {
+          "byte_exact_blocks": 50,
+          "maximum_pairwise_rotation_rad": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "p95": 0.0
+          },
+          "maximum_pairwise_translation_m": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "p95": 0.0
+          },
+          "per_initialization": [
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 0,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 1,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 2,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 3,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 4,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 5,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 6,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 7,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 8,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 9,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 10,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 11,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 12,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 13,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 14,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 15,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 16,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 17,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 18,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 19,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 20,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 21,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 22,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 23,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 24,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 25,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 26,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 27,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 28,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 29,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 30,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 31,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 32,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 33,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 34,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 35,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 36,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 37,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 38,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 39,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 40,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 41,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 42,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 43,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 44,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 45,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 46,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 47,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 48,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 49,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            }
+          ]
+        }
+      },
+      "raw_reset_info_exact_blocks": 50,
+      "same_seed_across_conditions": true,
+      "static_reset_fields_exact_blocks": 50
+    },
+    "move_near": {
+      "episodes": 200,
+      "initial_robot_eef_state_exact_blocks": 50,
+      "initialization_blocks": 50,
+      "outcome_discordant_blocks": 20,
+      "outcome_discordant_initialization_ids": [
+        0,
+        2,
+        3,
+        4,
+        5,
+        6,
+        8,
+        10,
+        12,
+        17,
+        18,
+        24,
+        26,
+        30,
+        31,
+        37,
+        39,
+        42,
+        45,
+        49
+      ],
+      "pose_fields": {
+        "episode_source_obj_init_pose_wrt_robot_base": {
+          "byte_exact_blocks": 17,
+          "maximum_pairwise_rotation_rad": {
+            "maximum": 0.010605405901182913,
+            "median": 2.4184838393629946e-05,
+            "p95": 0.008551020646527558
+          },
+          "maximum_pairwise_translation_m": {
+            "maximum": 0.0009087953565022463,
+            "median": 2.0782821811830084e-06,
+            "p95": 0.00030556890072427423
+          },
+          "per_initialization": [
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 0,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 1,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 2,
+              "maximum_pairwise_rotation_rad": 3.615047503143144e-05,
+              "maximum_pairwise_translation_m": 2.785677655417291e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 3,
+              "maximum_pairwise_rotation_rad": 9.674756519145026e-05,
+              "maximum_pairwise_translation_m": 3.600000000006376e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 4,
+              "maximum_pairwise_rotation_rad": 0.008059937384632392,
+              "maximum_pairwise_translation_m": 0.0002888170528206469
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 5,
+              "maximum_pairwise_rotation_rad": 0.0085978133454497,
+              "maximum_pairwise_translation_m": 0.00030823641900334
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 6,
+              "maximum_pairwise_rotation_rad": 0.010605405901182913,
+              "maximum_pairwise_translation_m": 0.0009087953565022463
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 7,
+              "maximum_pairwise_rotation_rad": 0.010605405901182913,
+              "maximum_pairwise_translation_m": 0.0009087953565022463
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 8,
+              "maximum_pairwise_rotation_rad": 5.8297067763667833e-05,
+              "maximum_pairwise_translation_m": 2.9732137495081228e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 9,
+              "maximum_pairwise_rotation_rad": 1.7664055457326938e-05,
+              "maximum_pairwise_translation_m": 2.507987240818102e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 10,
+              "maximum_pairwise_rotation_rad": 0.0036454082292040526,
+              "maximum_pairwise_translation_m": 0.00013259415522563425
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 11,
+              "maximum_pairwise_rotation_rad": 0.0018553687960702508,
+              "maximum_pairwise_translation_m": 6.34177419970066e-05
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 12,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 13,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 14,
+              "maximum_pairwise_rotation_rad": 0.003909975346882838,
+              "maximum_pairwise_translation_m": 6.431827112104891e-05
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 15,
+              "maximum_pairwise_rotation_rad": 0.007848389681783205,
+              "maximum_pairwise_translation_m": 0.00017910893333389103
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 16,
+              "maximum_pairwise_rotation_rad": 2.7091589667943047e-05,
+              "maximum_pairwise_translation_m": 2.154065922859048e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 17,
+              "maximum_pairwise_rotation_rad": 1.421073985716673e-05,
+              "maximum_pairwise_translation_m": 1.4866068747540614e-06
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 18,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 19,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 20,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 21,
+              "maximum_pairwise_rotation_rad": 0.0011157662950620631,
+              "maximum_pairwise_translation_m": 2.02148460296551e-05
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 22,
+              "maximum_pairwise_rotation_rad": 2.701910499692177e-05,
+              "maximum_pairwise_translation_m": 4.382921400164139e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 23,
+              "maximum_pairwise_rotation_rad": 1.0260615428880729e-05,
+              "maximum_pairwise_translation_m": 1.4142135623941355e-06
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 24,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 25,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 26,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 27,
+              "maximum_pairwise_rotation_rad": 3.2511164854692446e-05,
+              "maximum_pairwise_translation_m": 3.7363083384677207e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 28,
+              "maximum_pairwise_rotation_rad": 2.9503170266640836e-05,
+              "maximum_pairwise_translation_m": 3.13687742827777e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 29,
+              "maximum_pairwise_rotation_rad": 0.008493829570067165,
+              "maximum_pairwise_translation_m": 0.00030119198196498504
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 30,
+              "maximum_pairwise_rotation_rad": 0.008397296207460192,
+              "maximum_pairwise_translation_m": 0.0003023086006054162
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 31,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 32,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 33,
+              "maximum_pairwise_rotation_rad": 1.7733258337967295e-05,
+              "maximum_pairwise_translation_m": 1.0000000000287557e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 34,
+              "maximum_pairwise_rotation_rad": 3.909932947036684e-05,
+              "maximum_pairwise_translation_m": 2.0024984395069685e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 35,
+              "maximum_pairwise_rotation_rad": 0.0028359497174265066,
+              "maximum_pairwise_translation_m": 0.0001030955382157817
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 36,
+              "maximum_pairwise_rotation_rad": 0.0018553687960702508,
+              "maximum_pairwise_translation_m": 6.34177419970066e-05
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 37,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 38,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 39,
+              "maximum_pairwise_rotation_rad": 0.006879949020678025,
+              "maximum_pairwise_translation_m": 0.00017754495205438484
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 40,
+              "maximum_pairwise_rotation_rad": 0.008057951679514307,
+              "maximum_pairwise_translation_m": 0.00012573527746815653
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 41,
+              "maximum_pairwise_rotation_rad": 1.2861350974354186e-05,
+              "maximum_pairwise_translation_m": 5.999999999894978e-07
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 42,
+              "maximum_pairwise_rotation_rad": 2.135057179033812e-05,
+              "maximum_pairwise_translation_m": 1.0770329614527176e-06
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 43,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 44,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 45,
+              "maximum_pairwise_rotation_rad": 0.007579342710053566,
+              "maximum_pairwise_translation_m": 0.0001268432497218608
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 46,
+              "maximum_pairwise_rotation_rad": 0.005806768639416654,
+              "maximum_pairwise_translation_m": 0.00019329637865205744
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 47,
+              "maximum_pairwise_rotation_rad": 2.0129654301109403e-05,
+              "maximum_pairwise_translation_m": 6.000000000033756e-07
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 48,
+              "maximum_pairwise_rotation_rad": 4.241782458624191e-06,
+              "maximum_pairwise_translation_m": 1.6763054614573224e-06
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 49,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            }
+          ]
+        },
+        "episode_target_obj_init_pose_wrt_robot_base": {
+          "byte_exact_blocks": 17,
+          "maximum_pairwise_rotation_rad": {
+            "maximum": 0.010605405901182913,
+            "median": 2.6253790639808507e-05,
+            "p95": 0.008564511763285022
+          },
+          "maximum_pairwise_translation_m": {
+            "maximum": 0.0009087953565022463,
+            "median": 2.298594621019995e-06,
+            "p95": 0.00028721974596817885
+          },
+          "per_initialization": [
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 0,
+              "maximum_pairwise_rotation_rad": 7.298367270710773e-05,
+              "maximum_pairwise_translation_m": 4.716990566021251e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 1,
+              "maximum_pairwise_rotation_rad": 0.0016442083847876983,
+              "maximum_pairwise_translation_m": 6.006904360816853e-05
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 2,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 3,
+              "maximum_pairwise_rotation_rad": 0.008784623091676644,
+              "maximum_pairwise_translation_m": 0.00031031385724778187
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 4,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 5,
+              "maximum_pairwise_rotation_rad": 6.511645811837374e-05,
+              "maximum_pairwise_translation_m": 3.6823905278904393e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 6,
+              "maximum_pairwise_rotation_rad": 6.984167734438536e-05,
+              "maximum_pairwise_translation_m": 4.609772228705243e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 7,
+              "maximum_pairwise_rotation_rad": 0.0018280089336574182,
+              "maximum_pairwise_translation_m": 6.722172267950574e-05
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 8,
+              "maximum_pairwise_rotation_rad": 0.010605405901182913,
+              "maximum_pairwise_translation_m": 0.0009087953565022463
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 9,
+              "maximum_pairwise_rotation_rad": 0.0028080075006771395,
+              "maximum_pairwise_translation_m": 9.759923155435296e-05
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 10,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 11,
+              "maximum_pairwise_rotation_rad": 5.27279225942351e-05,
+              "maximum_pairwise_translation_m": 4.317406629000727e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 12,
+              "maximum_pairwise_rotation_rad": 0.0031940111394957445,
+              "maximum_pairwise_translation_m": 0.00019417747037173857
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 13,
+              "maximum_pairwise_rotation_rad": 1.0447658831896972e-05,
+              "maximum_pairwise_translation_m": 1.345362404736774e-06
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 14,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 15,
+              "maximum_pairwise_rotation_rad": 1.4146092288324387e-05,
+              "maximum_pairwise_translation_m": 1.799999999996249e-06
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 16,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 17,
+              "maximum_pairwise_rotation_rad": 0.008185433872649884,
+              "maximum_pairwise_translation_m": 0.0001315191621020218
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 18,
+              "maximum_pairwise_rotation_rad": 0.008295486806361932,
+              "maximum_pairwise_translation_m": 0.00017925802631961574
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 19,
+              "maximum_pairwise_rotation_rad": 6.401466701323953e-06,
+              "maximum_pairwise_translation_m": 1.1180339887758383e-06
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 20,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 21,
+              "maximum_pairwise_rotation_rad": 6.240367201678406e-06,
+              "maximum_pairwise_translation_m": 2.6248809496875577e-06
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 22,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 23,
+              "maximum_pairwise_rotation_rad": 4.552118171628599e-05,
+              "maximum_pairwise_translation_m": 4.565084884205884e-06
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 24,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 25,
+              "maximum_pairwise_rotation_rad": 3.538724296724162e-05,
+              "maximum_pairwise_translation_m": 1.8999999999991246e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 26,
+              "maximum_pairwise_rotation_rad": 0.007232542077210652,
+              "maximum_pairwise_translation_m": 0.0002589936099597754
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 27,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 28,
+              "maximum_pairwise_rotation_rad": 0.0026741085937378468,
+              "maximum_pairwise_translation_m": 9.659420272460829e-05
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 29,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 30,
+              "maximum_pairwise_rotation_rad": 6.511645811837374e-05,
+              "maximum_pairwise_translation_m": 1.972308292352432e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 31,
+              "maximum_pairwise_rotation_rad": 9.373948030693954e-05,
+              "maximum_pairwise_translation_m": 4.609772228657075e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 32,
+              "maximum_pairwise_rotation_rad": 0.0005304700937457149,
+              "maximum_pairwise_translation_m": 1.6763054614235452e-05
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 33,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 34,
+              "maximum_pairwise_rotation_rad": 0.009649854796302962,
+              "maximum_pairwise_translation_m": 0.0003474021444953955
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 35,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 36,
+              "maximum_pairwise_rotation_rad": 3.909932947036684e-05,
+              "maximum_pairwise_translation_m": 3.360059523323151e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 37,
+              "maximum_pairwise_rotation_rad": 0.006976495589702364,
+              "maximum_pairwise_translation_m": 0.0001293097444123828
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 38,
+              "maximum_pairwise_rotation_rad": 7.1276788372443476e-06,
+              "maximum_pairwise_translation_m": 1.4142135623941355e-06
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 39,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 40,
+              "maximum_pairwise_rotation_rad": 1.1393611432152756e-05,
+              "maximum_pairwise_translation_m": 1.3453624047274902e-06
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 41,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 42,
+              "maximum_pairwise_rotation_rad": 0.005847741081097723,
+              "maximum_pairwise_translation_m": 0.00018723610762889166
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 43,
+              "maximum_pairwise_rotation_rad": 0.007623074265189531,
+              "maximum_pairwise_translation_m": 0.00013264629659362698
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 44,
+              "maximum_pairwise_rotation_rad": 1.1779949912351467e-05,
+              "maximum_pairwise_translation_m": 1.118033988769632e-06
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 45,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 46,
+              "maximum_pairwise_rotation_rad": 1.7120338312375393e-05,
+              "maximum_pairwise_translation_m": 3.1622776601978733e-06
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 47,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 48,
+              "maximum_pairwise_rotation_rad": 0.008163294625596491,
+              "maximum_pairwise_translation_m": 0.00017980545041798384
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 49,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            }
+          ]
+        }
+      },
+      "raw_reset_info_exact_blocks": 3,
+      "same_seed_across_conditions": true,
+      "static_reset_fields_exact_blocks": 50
+    },
+    "open_drawer": {
+      "episodes": 200,
+      "initial_robot_eef_state_exact_blocks": 50,
+      "initialization_blocks": 50,
+      "outcome_discordant_blocks": 12,
+      "outcome_discordant_initialization_ids": [
+        0,
+        8,
+        12,
+        15,
+        22,
+        26,
+        27,
+        34,
+        36,
+        41,
+        47,
+        48
+      ],
+      "pose_fields": {
+        "cabinet_pose_wrt_robot_base": {
+          "byte_exact_blocks": 50,
+          "maximum_pairwise_rotation_rad": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "p95": 0.0
+          },
+          "maximum_pairwise_translation_m": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "p95": 0.0
+          },
+          "per_initialization": [
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 0,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 1,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 2,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 3,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 4,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 5,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 6,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 7,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 8,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 9,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 10,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 11,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 12,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 13,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 14,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 15,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 16,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 17,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 18,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 19,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 20,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 21,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 22,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 23,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 24,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 25,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 26,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 27,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 28,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 29,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 30,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 31,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 32,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 33,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 34,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 35,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 36,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 37,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 38,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 39,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 40,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 41,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 42,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 43,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 44,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 45,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 46,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 47,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 48,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 49,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            }
+          ]
+        },
+        "drawer_pose_wrt_robot_base": {
+          "byte_exact_blocks": 50,
+          "maximum_pairwise_rotation_rad": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "p95": 0.0
+          },
+          "maximum_pairwise_translation_m": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "p95": 0.0
+          },
+          "per_initialization": [
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 0,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 1,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 2,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 3,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 4,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 5,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 6,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 7,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 8,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 9,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 10,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 11,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 12,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 13,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 14,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 15,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 16,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 17,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 18,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 19,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 20,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 21,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 22,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 23,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 24,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 25,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 26,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 27,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 28,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 29,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 30,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 31,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 32,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 33,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 34,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 35,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 36,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 37,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 38,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 39,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 40,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 41,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 42,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 43,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 44,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 45,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 46,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 47,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 48,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 49,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            }
+          ]
+        }
+      },
+      "raw_reset_info_exact_blocks": 50,
+      "same_seed_across_conditions": true,
+      "static_reset_fields_exact_blocks": 50
+    },
+    "pick_can": {
+      "episodes": 200,
+      "initial_robot_eef_state_exact_blocks": 50,
+      "initialization_blocks": 50,
+      "outcome_discordant_blocks": 3,
+      "outcome_discordant_initialization_ids": [
+        1,
+        2,
+        49
+      ],
+      "pose_fields": {
+        "obj_init_pose_wrt_robot_base": {
+          "byte_exact_blocks": 1,
+          "maximum_pairwise_rotation_rad": {
+            "maximum": 0.002749904562089016,
+            "median": 2.993710424120793e-05,
+            "p95": 0.0021668228829634694
+          },
+          "maximum_pairwise_translation_m": {
+            "maximum": 8.963258336119213e-05,
+            "median": 4.8817010727501864e-06,
+            "p95": 7.011135888337493e-05
+          },
+          "per_initialization": [
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 0,
+              "maximum_pairwise_rotation_rad": 1.3544885039408732e-05,
+              "maximum_pairwise_translation_m": 3.858756276285288e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 1,
+              "maximum_pairwise_rotation_rad": 0.001060972589041405,
+              "maximum_pairwise_translation_m": 3.8329623008827516e-05
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 2,
+              "maximum_pairwise_rotation_rad": 0.00014120926572002446,
+              "maximum_pairwise_translation_m": 5.830951894779731e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 3,
+              "maximum_pairwise_rotation_rad": 2.210990893552955e-05,
+              "maximum_pairwise_translation_m": 1.4142135623941355e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 4,
+              "maximum_pairwise_rotation_rad": 5.38012404113925e-06,
+              "maximum_pairwise_translation_m": 1.4142135622960048e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 5,
+              "maximum_pairwise_rotation_rad": 0.0001906366557161889,
+              "maximum_pairwise_translation_m": 7.502666192742185e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 6,
+              "maximum_pairwise_rotation_rad": 0.002314583719379071,
+              "maximum_pairwise_translation_m": 7.623752356940389e-05
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 7,
+              "maximum_pairwise_rotation_rad": 0.0020051106520495273,
+              "maximum_pairwise_translation_m": 6.618912297350123e-05
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 8,
+              "maximum_pairwise_rotation_rad": 0.0006660558072309298,
+              "maximum_pairwise_translation_m": 2.1047565179788478e-05
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 9,
+              "maximum_pairwise_rotation_rad": 0.0008001946285290526,
+              "maximum_pairwise_translation_m": 2.5199206336762143e-05
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 10,
+              "maximum_pairwise_rotation_rad": 1.5384234782903528e-05,
+              "maximum_pairwise_translation_m": 1.1661903789954545e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 11,
+              "maximum_pairwise_rotation_rad": 1.2471835736674333e-05,
+              "maximum_pairwise_translation_m": 2.0000000000575113e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 12,
+              "maximum_pairwise_rotation_rad": 2.001851078131248e-05,
+              "maximum_pairwise_translation_m": 2.6907248094642643e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 13,
+              "maximum_pairwise_rotation_rad": 0.0010601415998243435,
+              "maximum_pairwise_translation_m": 3.33138109497693e-05
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 14,
+              "maximum_pairwise_rotation_rad": 0.00039379868781997713,
+              "maximum_pairwise_translation_m": 1.4071247279431104e-05
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 15,
+              "maximum_pairwise_rotation_rad": 3.438564267571252e-05,
+              "maximum_pairwise_translation_m": 1.1401754251011303e-05
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 16,
+              "maximum_pairwise_rotation_rad": 0.00013868913469276524,
+              "maximum_pairwise_translation_m": 6.7535176020185635e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 17,
+              "maximum_pairwise_rotation_rad": 0.00044433341269626853,
+              "maximum_pairwise_translation_m": 1.2083045973608954e-05
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 18,
+              "maximum_pairwise_rotation_rad": 0.0016628464664577849,
+              "maximum_pairwise_translation_m": 5.3047148839580684e-05
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 19,
+              "maximum_pairwise_rotation_rad": 1.0918962496058074e-05,
+              "maximum_pairwise_translation_m": 2.973213749428307e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 20,
+              "maximum_pairwise_rotation_rad": 2.548856580670334e-05,
+              "maximum_pairwise_translation_m": 2.000000000002e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 21,
+              "maximum_pairwise_rotation_rad": 0.00018367794361346589,
+              "maximum_pairwise_translation_m": 3.4481879298885287e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 22,
+              "maximum_pairwise_rotation_rad": 7.4813920932355735e-06,
+              "maximum_pairwise_translation_m": 4.123105625601589e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 23,
+              "maximum_pairwise_rotation_rad": 1.741175021143814e-05,
+              "maximum_pairwise_translation_m": 4.2426406871824066e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 24,
+              "maximum_pairwise_rotation_rad": 0.0013245423419128417,
+              "maximum_pairwise_translation_m": 4.6347491841515576e-05
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 25,
+              "maximum_pairwise_rotation_rad": 1.8895753519744737e-05,
+              "maximum_pairwise_translation_m": 4.763402145512027e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 26,
+              "maximum_pairwise_rotation_rad": 1.7708197899881704e-05,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 27,
+              "maximum_pairwise_rotation_rad": 0.0001118131981721924,
+              "maximum_pairwise_translation_m": 4.999999999988347e-06
+            },
+            {
+              "byte_exact_across_conditions": true,
+              "initialization_id": 28,
+              "maximum_pairwise_rotation_rad": 0.0,
+              "maximum_pairwise_translation_m": 0.0
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 29,
+              "maximum_pairwise_rotation_rad": 1.7786918849811737e-05,
+              "maximum_pairwise_translation_m": 1.8027756377491936e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 30,
+              "maximum_pairwise_rotation_rad": 1.9943655356627183e-05,
+              "maximum_pairwise_translation_m": 3.299999999997749e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 31,
+              "maximum_pairwise_rotation_rad": 0.0010595039951839299,
+              "maximum_pairwise_translation_m": 3.3339016182199075e-05
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 32,
+              "maximum_pairwise_rotation_rad": 1.1747862285571784e-05,
+              "maximum_pairwise_translation_m": 2.8136986334818227e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 33,
+              "maximum_pairwise_rotation_rad": 0.0011435656808502193,
+              "maximum_pairwise_translation_m": 3.7296950277426244e-05
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 34,
+              "maximum_pairwise_rotation_rad": 1.6513229910015853e-05,
+              "maximum_pairwise_translation_m": 6.2297672508871455e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 35,
+              "maximum_pairwise_rotation_rad": 0.00018937819346724247,
+              "maximum_pairwise_translation_m": 1.0000000000065512e-05
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 36,
+              "maximum_pairwise_rotation_rad": 1.4983486214784953e-05,
+              "maximum_pairwise_translation_m": 4.313930922007865e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 37,
+              "maximum_pairwise_rotation_rad": 1.4450162412884118e-05,
+              "maximum_pairwise_translation_m": 8.999999999981245e-07
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 38,
+              "maximum_pairwise_rotation_rad": 0.0015239605770974915,
+              "maximum_pairwise_translation_m": 4.8187135212673494e-05
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 39,
+              "maximum_pairwise_rotation_rad": 0.0022991328900748777,
+              "maximum_pairwise_translation_m": 7.332046099145346e-05
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 40,
+              "maximum_pairwise_rotation_rad": 0.00012570851685069376,
+              "maximum_pairwise_translation_m": 4.242640687103902e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 41,
+              "maximum_pairwise_rotation_rad": 3.508076422110569e-06,
+              "maximum_pairwise_translation_m": 2.6925824035357992e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 42,
+              "maximum_pairwise_rotation_rad": 1.9920484015892303e-05,
+              "maximum_pairwise_translation_m": 5.0990195135965236e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 43,
+              "maximum_pairwise_rotation_rad": 1.7125732832246583e-05,
+              "maximum_pairwise_translation_m": 3.195309061709795e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 44,
+              "maximum_pairwise_rotation_rad": 0.0005501498898244252,
+              "maximum_pairwise_translation_m": 1.7117242768668374e-05
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 45,
+              "maximum_pairwise_rotation_rad": 0.0004331650858123663,
+              "maximum_pairwise_translation_m": 1.204193090819246e-05
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 46,
+              "maximum_pairwise_rotation_rad": 0.002749904562089016,
+              "maximum_pairwise_translation_m": 8.963258336119213e-05
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 47,
+              "maximum_pairwise_rotation_rad": 2.0894042442013344e-05,
+              "maximum_pairwise_translation_m": 3.4999999999965614e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 48,
+              "maximum_pairwise_rotation_rad": 8.265511723023013e-06,
+              "maximum_pairwise_translation_m": 1.3999999999986246e-06
+            },
+            {
+              "byte_exact_across_conditions": false,
+              "initialization_id": 49,
+              "maximum_pairwise_rotation_rad": 8.792139704321423e-06,
+              "maximum_pairwise_translation_m": 1.0000000000287557e-06
+            }
+          ]
+        }
+      },
+      "raw_reset_info_exact_blocks": 1,
+      "same_seed_across_conditions": true,
+      "static_reset_fields_exact_blocks": 50
+    }
+  }
+}

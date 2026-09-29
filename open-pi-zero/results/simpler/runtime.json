@@ -1,0 +1,142 @@
+{
+  "campaign": "paired_closed_loop_simpler",
+  "checkpoint_sha256": "1da40985d963ddf394fa63e7db5ddd4cd8082d5c6ce0b2a0cae56abd8b6ec0eb",
+  "conditions": {
+    "native_dynamic": {
+      "dynamic_batching": true,
+      "implementation": "native"
+    },
+    "native_singleton": {
+      "dynamic_batching": false,
+      "implementation": "native"
+    },
+    "patched_dynamic": {
+      "dynamic_batching": true,
+      "implementation": "full_invariant"
+    },
+    "patched_singleton": {
+      "dynamic_batching": false,
+      "implementation": "full_invariant"
+    }
+  },
+  "dynamic_batch_cycle": [
+    1,
+    2,
+    4,
+    8
+  ],
+  "evaluation_harness_sha": "2414244c6c46c715f902b5a83c6f4487256b5c29",
+  "execution": {
+    "policy_python": "/usr/bin/python3.12",
+    "resume_enabled": true,
+    "simpler_python": "/usr/bin/python3.10",
+    "tokenizer_path": "/workspace/pizero-assets/paligemma-tokenizer",
+    "vulkan_icd": "/etc/vulkan/icd.d/nvidia_icd.json"
+  },
+  "expected_episodes": 800,
+  "frozen_operator_baseline_sha": "14dafb5fd84350dc796a96cbecb566ca6295593f",
+  "graphics_runtime": {
+    "NVIDIA_DRIVER_CAPABILITIES": "all",
+    "VK_DRIVER_FILES": "/etc/vulkan/icd.d/nvidia_icd.json",
+    "VK_LOADER_LAYERS_DISABLE": "~implicit~",
+    "egl_loader": {
+      "path": "/workspace/current-paper-experiment-workdir/.runtime/lib/libEGL.so.1.1.0",
+      "sha256": "875ecbb2a07d60e32216c9f102965abc1e9cc1da7789558e2e9b8b9c107e231d",
+      "size_bytes": 72312
+    },
+    "vulkan_icd": {
+      "path": "/etc/vulkan/icd.d/nvidia_icd.json",
+      "sha256": "8bf904abc1c5d6428a1f27cc5d4a3c9783d15231f17ce1ef8d25e9cab1f60d1c",
+      "size_bytes": 140
+    },
+    "vulkaninfo_summary": "==========\nVULKANINFO\n==========\n\nVulkan Instance Version: 1.3.275\n\n\nInstance Extensions: count = 23\n-------------------------------\nVK_EXT_acquire_drm_display             : extension revision 1\nVK_EXT_acquire_xlib_display            : extension revision 1\nVK_EXT_debug_report                    : extension revision 10\nVK_EXT_debug_utils                     : extension revision 2\nVK_EXT_direct_mode_display             : extension revision 1\nVK_EXT_display_surface_counter         : extension revision 1\nVK_EXT_surface_maintenance1            : extension revision 1\nVK_EXT_swapchain_colorspace            : extension revision 5\nVK_KHR_device_group_creation           : extension revision 1\nVK_KHR_display                         : extension revision 23\nVK_KHR_external_fence_capabilities     : extension revision 1\nVK_KHR_external_memory_capabilities    : extension revision 1\nVK_KHR_external_semaphore_capabilities : extension revision 1\nVK_KHR_get_display_properties2         : extension revision 1\nVK_KHR_get_physical_device_properties2 : extension revision 2\nVK_KHR_get_surface_capabilities2       : extension revision 1\nVK_KHR_portability_enumeration         : extension revision 1\nVK_KHR_surface                         : extension revision 25\nVK_KHR_surface_protected_capabilities  : extension revision 1\nVK_KHR_wayland_surface                 : extension revision 6\nVK_KHR_xcb_surface                     : extension revision 6\nVK_KHR_xlib_surface                    : extension revision 6\nVK_LUNARG_direct_driver_loading        : extension revision 1\n\nInstance Layers:\n----------------\n\nDevices:\n========\nGPU0:\n\tapiVersion         = 1.4.329\n\tdriverVersion      = 595.91.7.0\n\tvendorID           = 0x10de\n\tdeviceID           = 0x2bb5\n\tdeviceType         = PHYSICAL_DEVICE_TYPE_DISCRETE_GPU\n\tdeviceName         = NVIDIA RTX PRO 6000 Blackwell Server Edition\n\tdriverID           = DRIVER_ID_NVIDIA_PROPRIETARY\n\tdriverName         = NVIDIA\n\tdriverInfo         = 595.91.07\n\tconformanceVersion = 1.4.3.3\n\tdeviceUUID         = 63cbdbc3-ef09-5abb-8ec0-27c3d63f0b16\n\tdriverUUID         = 84d66e5a-5337-5512-92cd-fc48fce44ebd"
+  },
+  "hardware": {
+    "compute_capability": [
+      12,
+      0
+    ],
+    "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+    "total_memory_bytes": 101975851008
+  },
+  "initializations_per_task": 50,
+  "launched_at": "2026-09-28T20:16:04.182822+00:00",
+  "numerical_policy_sha": "a2576bbac02fca0ba1868843475f4a644835bdf1",
+  "policy_noise_scheme": "sha256-indexed-by-task-initialization-policy-call",
+  "replay_manifest_sha256": "7b2e3cee5635112b885862865a879d4e4a089efb292b10d50fdbf5e222f1dd08",
+  "repositories": {
+    "maniskill2_real2sim_sha": "91d154bfd864577f8d2e80f3fc2f8b4d9df9ae5c",
+    "simpler_env_sha": "59ad9e1539042ed333fd8ebba1b0395f5662f0bd"
+  },
+  "resume_events": [],
+  "rtx_environment_sha256": "291ba09f48c1aa30d05a1b69a1856f456436887578808117e32bfda1073bcb0c",
+  "rtx_launch_adaptation_sha": "8fdbcada1401608622a07e1d35b645973deb905d",
+  "schema_version": 1,
+  "seed": 20250311,
+  "software": {
+    "cuda_runtime": "12.8",
+    "pytorch": "2.8.0+cu128"
+  },
+  "source_sha256": {
+    "analyze_simpler.py": "811011f7282af49109c1651f6fa9112dfcb4f3715f08ed969b95c986ab02e41a",
+    "simpler_eval.py": "ca8fc8731cf4685dc3217947805bfab9f14607539270ad3bc904001860b35791",
+    "simpler_support.py": "8166c03352c639ec0cf2af6540f9d87e28f3604fa56a30e0be88f7aa7770bc14",
+    "simpler_worker.py": "59305b9984d8f40f3070a1ccb6e613f9760fac8c03318f1a49d082b233a7a732"
+  },
+  "tasks": [
+    "close_drawer",
+    "move_near",
+    "open_drawer",
+    "pick_can"
+  ],
+  "tokenizer": {
+    "excluded_directories": [
+      ".cache"
+    ],
+    "file_count": 8,
+    "files": [
+      {
+        "path": "added_tokens.json",
+        "sha256": "7d0bad90030d638a4bf89a82e91206e25f1fbe0012f14bca21666a64b643bc49",
+        "size_bytes": 24
+      },
+      {
+        "path": "config.json",
+        "sha256": "e00c72cdff16296bf1229c3267b99f5247d8c740cae84336866338d64fa7918f",
+        "size_bytes": 1027
+      },
+      {
+        "path": "generation_config.json",
+        "sha256": "e851cababc44e9fbd81a42b19f9220638832bf8a17e0927bb7cbba97b446893d",
+        "size_bytes": 137
+      },
+      {
+        "path": "preprocessor_config.json",
+        "sha256": "ae5e5f748a642ae71344facf4012b1607852db13f080e42cd12b5db4e75ca7e8",
+        "size_bytes": 699
+      },
+      {
+        "path": "special_tokens_map.json",
+        "sha256": "5ef37093ae4236587b6e8266acb815b46e2db8ce656c66552bfa574d32880405",
+        "size_bytes": 607
+      },
+      {
+        "path": "tokenizer.json",
+        "sha256": "ef6773c135b77b834de1d13c75a4c98ab7a3684ffd602d1831e1f1bf5467c563",
+        "size_bytes": 17549604
+      },
+      {
+        "path": "tokenizer.model",
+        "sha256": "8986bb4f423f07f8c7f70d0dbe3526fb2316056c17bae71b1ea975e77a168fc6",
+        "size_bytes": 4264023
+      },
+      {
+        "path": "tokenizer_config.json",
+        "sha256": "3259402b1d1802e02417d7bff75a889ec61d359d15be6050a957b307c48edbbe",
+        "size_bytes": 39968
+      }
+    ],
+    "sha256": "64516a95741d80f99eb0a1202f8dd703f0a5da46f76742804c53a60dbb354580",
+    "size_bytes": 21856089
+  }
+}

@@ -7,7 +7,9 @@ from collections import defaultdict
 from pathlib import Path
 from uuid import UUID
 
+from experiments.analyze_simpler_resets import static_reset_info
 from experiments.common import sha256_file, sha256_tree, utc_timestamp, write_json
+from experiments.package_jsonl import archive_identity, file_identity
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -458,6 +460,150 @@ def simpler_audit(
     }
 
 
+def simpler_reset_audit(path: Path, episodes_path: Path) -> dict:
+    reset_audit = json.loads(path.read_text())
+    episodes = jsonl(episodes_path)
+    assert reset_audit["schema_version"] == 1
+    assert reset_audit["source"] == {
+        "path": str(episodes_path.relative_to(ROOT)),
+        "records": len(episodes),
+        "size_bytes": episodes_path.stat().st_size,
+        "sha256": sha256_file(episodes_path),
+    }
+    assert reset_audit["method"]["conditions"] == [
+        "native_singleton", "native_dynamic",
+        "patched_singleton", "patched_dynamic",
+    ]
+    expected_tasks = {"pick_can", "move_near", "open_drawer", "close_drawer"}
+    assert set(reset_audit["tasks"]) == expected_tasks
+    grouped = defaultdict(list)
+    for episode in episodes:
+        grouped[(episode["task"], episode["initialization_id"])].append(episode)
+    assert len(grouped) == 200
+
+    for task in expected_tasks:
+        task_summary = reset_audit["tasks"][task]
+        task_groups = {
+            initialization_id: grouped[(task, initialization_id)]
+            for initialization_id in range(50)
+        }
+        assert task_summary["episodes"] == 200
+        assert task_summary["initialization_blocks"] == 50
+        assert task_summary["same_seed_across_conditions"] is True
+        assert all(
+            len(group) == 4
+            and {item["initialization_seed"] for item in group}
+            == {20250311 + initialization_id}
+            for initialization_id, group in task_groups.items()
+        )
+        raw_exact = sum(
+            len({item["reset_info"] for item in group}) == 1
+            for group in task_groups.values()
+        )
+        static_exact = sum(
+            len({static_reset_info(item["reset_info"]) for item in group}) == 1
+            for group in task_groups.values()
+        )
+        state_exact = sum(
+            all(item["trajectory"][0] == group[0]["trajectory"][0] for item in group)
+            for group in task_groups.values()
+        )
+        discordant = sorted(
+            initialization_id
+            for initialization_id, group in task_groups.items()
+            if len({item["success"] for item in group}) > 1
+        )
+        assert task_summary["raw_reset_info_exact_blocks"] == raw_exact
+        assert task_summary["static_reset_fields_exact_blocks"] == static_exact
+        assert task_summary["initial_robot_eef_state_exact_blocks"] == state_exact
+        assert task_summary["outcome_discordant_blocks"] == len(discordant)
+        assert task_summary["outcome_discordant_initialization_ids"] == discordant
+        assert static_exact == state_exact == 50
+        for pose_summary in task_summary["pose_fields"].values():
+            per_initialization = pose_summary["per_initialization"]
+            assert [item["initialization_id"] for item in per_initialization] == list(range(50))
+            assert pose_summary["byte_exact_blocks"] == sum(
+                item["byte_exact_across_conditions"] for item in per_initialization
+            )
+            for key in (
+                "maximum_pairwise_translation_m",
+                "maximum_pairwise_rotation_rad",
+            ):
+                values = [item[key] for item in per_initialization]
+                distribution = pose_summary[key]
+                assert all(math.isfinite(value) and value >= 0.0 for value in values)
+                assert all(
+                    math.isfinite(distribution[name]) and distribution[name] >= 0.0
+                    for name in ("median", "p95", "maximum")
+                )
+                assert distribution["maximum"] == max(values)
+
+    for task in ("open_drawer", "close_drawer"):
+        task_summary = reset_audit["tasks"][task]
+        assert task_summary["raw_reset_info_exact_blocks"] == 50
+        assert all(
+            pose["maximum_pairwise_translation_m"]["maximum"] == 0.0
+            and pose["maximum_pairwise_rotation_rad"]["maximum"] == 0.0
+            for pose in task_summary["pose_fields"].values()
+        )
+    for task in ("pick_can", "move_near"):
+        task_summary = reset_audit["tasks"][task]
+        assert task_summary["raw_reset_info_exact_blocks"] < 50
+        assert any(
+            pose["maximum_pairwise_translation_m"]["maximum"] > 0.0
+            or pose["maximum_pairwise_rotation_rad"]["maximum"] > 0.0
+            for pose in task_summary["pose_fields"].values()
+        )
+    return {
+        "source_sha256": reset_audit["source"]["sha256"],
+        "qualification": reset_audit["method"]["qualification"],
+        "tasks": {
+            task: {
+                "raw_reset_info_exact_blocks": reset_audit["tasks"][task][
+                    "raw_reset_info_exact_blocks"
+                ],
+                "static_reset_fields_exact_blocks": reset_audit["tasks"][task][
+                    "static_reset_fields_exact_blocks"
+                ],
+                "initial_robot_eef_state_exact_blocks": reset_audit["tasks"][task][
+                    "initial_robot_eef_state_exact_blocks"
+                ],
+            }
+            for task in sorted(expected_tasks)
+        },
+    }
+
+
+def archive_audit(path: Path) -> dict:
+    manifest = json.loads(path.read_text())
+    assert manifest["schema_version"] == 1
+    expected_counts = {
+        "results/heldout/invariance.jsonl": 110_400,
+        "results/heldout/singleton_fidelity.jsonl": 2_400,
+        "results/simpler/episodes.jsonl": 800,
+    }
+    assert {item["source"] for item in manifest["archives"]} == set(expected_counts)
+    for item in manifest["archives"]:
+        assert item["format"] == "gzip"
+        assert item["compression_level"] == 6
+        assert item["gzip_mtime"] == 0
+        assert item["raw"]["line_count"] == expected_counts[item["source"]]
+        assert file_identity(ROOT / item["source"]) == item["raw"]
+        observed = archive_identity(ROOT / item["archive"])
+        assert observed["uncompressed"] == item["raw"]
+        assert observed["compressed"] == item["compressed"]
+    return {
+        "manifest": str(path.relative_to(ROOT)),
+        "archives": len(manifest["archives"]),
+        "raw_records": sum(item["raw"]["line_count"] for item in manifest["archives"]),
+        "raw_size_bytes": sum(item["raw"]["size_bytes"] for item in manifest["archives"]),
+        "compressed_size_bytes": sum(
+            item["compressed"]["size_bytes"] for item in manifest["archives"]
+        ),
+        "verified": True,
+    }
+
+
 def main() -> None:
     operator = jsonl(RESULTS / "operator" / "raw.jsonl")
     assert len(operator) == 72_000
@@ -548,6 +694,11 @@ def main() -> None:
         freeze,
         rtx_environment,
     )
+    simpler_resets = simpler_reset_audit(
+        RESULTS / "simpler" / "reset_audit.json",
+        RESULTS / "simpler" / "episodes.jsonl",
+    )
+    archives = archive_audit(RESULTS / "archive_manifest.json")
     flow_summary = flow_summary_audit(
         RESULTS / "heldout" / "flow_step_summary.json"
     )
@@ -567,6 +718,11 @@ def main() -> None:
         "results/heldout/flow_step_summary.json",
         "results/diagnostic/flow_step_summary.json",
         "results/simpler/summary.json",
+        "results/simpler/reset_audit.json",
+        "results/archive_manifest.json",
+        "results/heldout/invariance.jsonl.gz",
+        "results/heldout/singleton_fidelity.jsonl.gz",
+        "results/simpler/episodes.jsonl.gz",
         "results/EXPERIMENT_REPORT.md",
     ):
         assert (ROOT / relative).stat().st_size > 0
@@ -582,6 +738,8 @@ def main() -> None:
     assert "Trajectory formulas:" in report
     assert "Persistent-vs-explicit invariant kernel differences:" in report
     assert "Complete-policy invariant-vs-native dynamic differences" in report
+    assert "Reset-pairing qualification:" in report
+    assert "post-reset physics nondeterminism as a disclosed confound" in report
 
     audit = {
         "schema_version": 1,
@@ -630,6 +788,8 @@ def main() -> None:
         },
         "replay": replay["counts"],
         "simpler": simpler,
+        "simpler_reset_pairing": simpler_resets,
+        "archives": archives,
         "performance": {
             "kernel_timing_samples": len(kernel),
             "policy_timing_samples": len(policy_timing),
