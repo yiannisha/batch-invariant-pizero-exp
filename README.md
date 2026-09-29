@@ -15,6 +15,8 @@ are retained alongside the measurements.
 ## Repository map
 
 - `PLAN.md` — the prespecified campaign plan and append-only execution log.
+- `COMMIT_SHA_MAP.md` — maps commit IDs embedded in frozen provenance records
+  to their equivalents after the authorship-metadata normalization.
 - `batch_invariant_ops/` — the exact CUDA/Triton operator source used by the
   completed campaign, including the RTX launch adaptation.
 - `open-pi-zero/` — the PiZero implementation and reproducible experiment.
