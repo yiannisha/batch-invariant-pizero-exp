@@ -1,0 +1,24 @@
+{
+  "frame_count": {
+    "native_dynamic": 114,
+    "native_singleton": 114,
+    "patched_dynamic": 114,
+    "patched_singleton": 114
+  },
+  "initialization": 3,
+  "native_video": "../../results/videos/open_drawer_start_03/open_drawer_start_03_native_singleton_vs_batched.mp4",
+  "outcomes": {
+    "native_dynamic": false,
+    "native_singleton": true,
+    "patched_dynamic": true,
+    "patched_singleton": true
+  },
+  "patched_rgb_frames_exact": true,
+  "patched_video": "../../results/videos/open_drawer_start_03/open_drawer_start_03_patched_singleton_vs_batched.mp4",
+  "snapshot": {
+    "observation_sha256": "32259806c6802240b674ad265590c21cdc21f450c09b500b50479cdcefe330b0",
+    "sim_state_sha256": "aac20eef7b668c4ac8965adab3f1463ed933b1fe58075b9c5d3c6d625bf202f7"
+  },
+  "source_episodes_sha256": "29bebb6db5603563ac19f8ae8251da0c5dfa10f42fd0c04c9d57496e4d2d0309",
+  "task": "open_drawer"
+}

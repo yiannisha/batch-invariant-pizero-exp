@@ -47,3 +47,16 @@ python experiments/analyze_snapshot_simpler.py \
 block stops the campaign for investigation; it is never silently combined with
 a newly generated snapshot. The results are valid for the recorded hardware,
 software, checkpoint, and scene configuration.
+
+## Verified video replays
+
+`render_snapshot_comparison.py` replays the recorded environment actions from
+one qualified block. It requires the original snapshot digests, every recorded
+trajectory state and reward, and the final outcome to match. It also requires
+the patched singleton and dynamic RGB frames to be identical before encoding.
+The videos show the original experiment trajectories, not a new policy run.
+
+- [Open Drawer start 3: native singleton vs dynamic](../../artifacts/open_drawer_start_03/open_drawer_start_03_native_singleton_vs_batched.mp4)
+- [Open Drawer start 3: patched singleton vs dynamic](../../artifacts/open_drawer_start_03/open_drawer_start_03_patched_singleton_vs_batched.mp4)
+- [Close Drawer start 5: native singleton vs dynamic](../../artifacts/close_drawer_start_05/close_drawer_start_05_native_singleton_vs_batched.mp4)
+- [Close Drawer start 5: patched singleton vs dynamic](../../artifacts/close_drawer_start_05/close_drawer_start_05_patched_singleton_vs_batched.mp4)
