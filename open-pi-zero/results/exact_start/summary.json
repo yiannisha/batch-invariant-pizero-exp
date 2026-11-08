@@ -1,0 +1,1699 @@
+{
+  "episode_sha256": {
+    "../../results/exact_start/close_drawer/episodes.jsonl": "1291c2d3f5f1fa2d21155839156942eb6a12d95da84bb148d947a0ec4d8e96ef",
+    "../../results/exact_start/move_near/episodes.jsonl": "46e0be4bc66dd03632a8db5b36f232acfe1099df6336b9ae8a257af21f0a917e",
+    "../../results/exact_start/open_drawer/episodes.jsonl": "b98d02f78075c83a0d9e0dc4f063f131e758d74e60ff1f029fbf0ba014cac620",
+    "../../results/exact_start/pick_can/episodes.jsonl": "33e9e024e4d438ad6bc5f5b125c36d613ad5bf5d4fd8671fd2c32953e2d4b1dc"
+  },
+  "schema_version": 1,
+  "tasks": {
+    "close_drawer": {
+      "blocks": 50,
+      "first_native_action_differences": [
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        }
+      ],
+      "native_action_divergence_count": 50,
+      "native_outcome_disagreements": 6,
+      "paired_differences": {
+        "native_dynamic_minus_singleton": {
+          "bootstrap_resamples": 10000,
+          "bootstrap_seed": 20250404,
+          "ci95": [
+            -0.18,
+            0.0
+          ],
+          "disagreements": 6,
+          "estimate": -0.08,
+          "unit": "episode"
+        },
+        "patched_dynamic_minus_native_dynamic": {
+          "bootstrap_resamples": 10000,
+          "bootstrap_seed": 20250404,
+          "ci95": [
+            -0.02,
+            0.18
+          ],
+          "disagreements": 6,
+          "estimate": 0.08,
+          "unit": "episode"
+        },
+        "patched_dynamic_minus_native_singleton": {
+          "bootstrap_resamples": 10000,
+          "bootstrap_seed": 20250404,
+          "ci95": [
+            -0.08,
+            0.08
+          ],
+          "disagreements": 4,
+          "estimate": 0.0,
+          "unit": "episode"
+        },
+        "patched_dynamic_minus_singleton": {
+          "bootstrap_resamples": 10000,
+          "bootstrap_seed": 20250404,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "disagreements": 0,
+          "estimate": 0.0,
+          "unit": "episode"
+        },
+        "patched_singleton_minus_native_singleton": {
+          "bootstrap_resamples": 10000,
+          "bootstrap_seed": 20250404,
+          "ci95": [
+            -0.08,
+            0.08
+          ],
+          "disagreements": 4,
+          "estimate": 0.0,
+          "unit": "episode"
+        }
+      },
+      "patched_outcome_disagreements": 0,
+      "qualified_native_outcome_disagreements": 6,
+      "success_rates": {
+        "native_dynamic": 0.68,
+        "native_singleton": 0.76,
+        "patched_dynamic": 0.76,
+        "patched_singleton": 0.76
+      }
+    },
+    "move_near": {
+      "blocks": 50,
+      "first_native_action_differences": [
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        }
+      ],
+      "native_action_divergence_count": 50,
+      "native_outcome_disagreements": 5,
+      "paired_differences": {
+        "native_dynamic_minus_singleton": {
+          "bootstrap_resamples": 10000,
+          "bootstrap_seed": 20250402,
+          "ci95": [
+            -0.2,
+            -0.02
+          ],
+          "disagreements": 5,
+          "estimate": -0.1,
+          "unit": "episode"
+        },
+        "patched_dynamic_minus_native_dynamic": {
+          "bootstrap_resamples": 10000,
+          "bootstrap_seed": 20250402,
+          "ci95": [
+            0.0,
+            0.18
+          ],
+          "disagreements": 6,
+          "estimate": 0.08,
+          "unit": "episode"
+        },
+        "patched_dynamic_minus_native_singleton": {
+          "bootstrap_resamples": 10000,
+          "bootstrap_seed": 20250402,
+          "ci95": [
+            -0.12,
+            0.06
+          ],
+          "disagreements": 5,
+          "estimate": -0.02,
+          "unit": "episode"
+        },
+        "patched_dynamic_minus_singleton": {
+          "bootstrap_resamples": 10000,
+          "bootstrap_seed": 20250402,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "disagreements": 0,
+          "estimate": 0.0,
+          "unit": "episode"
+        },
+        "patched_singleton_minus_native_singleton": {
+          "bootstrap_resamples": 10000,
+          "bootstrap_seed": 20250402,
+          "ci95": [
+            -0.12,
+            0.06
+          ],
+          "disagreements": 5,
+          "estimate": -0.02,
+          "unit": "episode"
+        }
+      },
+      "patched_outcome_disagreements": 0,
+      "qualified_native_outcome_disagreements": 5,
+      "success_rates": {
+        "native_dynamic": 0.76,
+        "native_singleton": 0.86,
+        "patched_dynamic": 0.84,
+        "patched_singleton": 0.84
+      }
+    },
+    "open_drawer": {
+      "blocks": 50,
+      "first_native_action_differences": [
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        }
+      ],
+      "native_action_divergence_count": 50,
+      "native_outcome_disagreements": 14,
+      "paired_differences": {
+        "native_dynamic_minus_singleton": {
+          "bootstrap_resamples": 10000,
+          "bootstrap_seed": 20250403,
+          "ci95": [
+            -0.14,
+            0.14
+          ],
+          "disagreements": 14,
+          "estimate": 0.0,
+          "unit": "episode"
+        },
+        "patched_dynamic_minus_native_dynamic": {
+          "bootstrap_resamples": 10000,
+          "bootstrap_seed": 20250403,
+          "ci95": [
+            -0.06,
+            0.22
+          ],
+          "disagreements": 12,
+          "estimate": 0.08,
+          "unit": "episode"
+        },
+        "patched_dynamic_minus_native_singleton": {
+          "bootstrap_resamples": 10000,
+          "bootstrap_seed": 20250403,
+          "ci95": [
+            -0.02,
+            0.2
+          ],
+          "disagreements": 8,
+          "estimate": 0.08,
+          "unit": "episode"
+        },
+        "patched_dynamic_minus_singleton": {
+          "bootstrap_resamples": 10000,
+          "bootstrap_seed": 20250403,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "disagreements": 0,
+          "estimate": 0.0,
+          "unit": "episode"
+        },
+        "patched_singleton_minus_native_singleton": {
+          "bootstrap_resamples": 10000,
+          "bootstrap_seed": 20250403,
+          "ci95": [
+            -0.02,
+            0.2
+          ],
+          "disagreements": 8,
+          "estimate": 0.08,
+          "unit": "episode"
+        }
+      },
+      "patched_outcome_disagreements": 0,
+      "qualified_native_outcome_disagreements": 14,
+      "success_rates": {
+        "native_dynamic": 0.46,
+        "native_singleton": 0.46,
+        "patched_dynamic": 0.54,
+        "patched_singleton": 0.54
+      }
+    },
+    "pick_can": {
+      "blocks": 50,
+      "first_native_action_differences": [
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        },
+        {
+          "action_index": 2,
+          "batch_size": 2,
+          "policy_call": 1,
+          "same_prior_recorded_states": true,
+          "same_target_input": true
+        }
+      ],
+      "native_action_divergence_count": 50,
+      "native_outcome_disagreements": 1,
+      "paired_differences": {
+        "native_dynamic_minus_singleton": {
+          "bootstrap_resamples": 10000,
+          "bootstrap_seed": 20250401,
+          "ci95": [
+            -0.06,
+            0.0
+          ],
+          "disagreements": 1,
+          "estimate": -0.02,
+          "unit": "episode"
+        },
+        "patched_dynamic_minus_native_dynamic": {
+          "bootstrap_resamples": 10000,
+          "bootstrap_seed": 20250401,
+          "ci95": [
+            0.0,
+            0.06
+          ],
+          "disagreements": 1,
+          "estimate": 0.02,
+          "unit": "episode"
+        },
+        "patched_dynamic_minus_native_singleton": {
+          "bootstrap_resamples": 10000,
+          "bootstrap_seed": 20250401,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "disagreements": 0,
+          "estimate": 0.0,
+          "unit": "episode"
+        },
+        "patched_dynamic_minus_singleton": {
+          "bootstrap_resamples": 10000,
+          "bootstrap_seed": 20250401,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "disagreements": 0,
+          "estimate": 0.0,
+          "unit": "episode"
+        },
+        "patched_singleton_minus_native_singleton": {
+          "bootstrap_resamples": 10000,
+          "bootstrap_seed": 20250401,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "disagreements": 0,
+          "estimate": 0.0,
+          "unit": "episode"
+        }
+      },
+      "patched_outcome_disagreements": 0,
+      "qualified_native_outcome_disagreements": 1,
+      "success_rates": {
+        "native_dynamic": 0.96,
+        "native_singleton": 0.98,
+        "patched_dynamic": 0.98,
+        "patched_singleton": 0.98
+      }
+    }
+  }
+}

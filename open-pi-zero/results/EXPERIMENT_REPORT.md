@@ -2,6 +2,8 @@
 
 This report is generated from the retained machine-readable measurements. Missing campaigns are marked unavailable rather than estimated.
 
+The later exact-start paired SIMPLER follow-up is reported separately in [exact_start/RESULTS.md](exact_start/RESULTS.md).
+
 ## Provenance
 
 - Policy revision: `a2576bbac02fca0ba1868843475f4a644835bdf1`

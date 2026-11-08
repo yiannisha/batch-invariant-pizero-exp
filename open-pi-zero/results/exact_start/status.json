@@ -1,0 +1,32 @@
+{
+  "analysis_stderr": "",
+  "analysis_stdout": "../../results/exact_start/summary.json\n",
+  "progress": {
+    "close_drawer": {
+      "expected_records": 400,
+      "pid": 4121007,
+      "process_alive": false,
+      "records": 400
+    },
+    "move_near": {
+      "expected_records": 400,
+      "pid": 3992082,
+      "process_alive": false,
+      "records": 400
+    },
+    "open_drawer": {
+      "expected_records": 400,
+      "pid": 4118230,
+      "process_alive": false,
+      "records": 400
+    },
+    "pick_can": {
+      "expected_records": 400,
+      "pid": 3979021,
+      "process_alive": false,
+      "records": 400
+    }
+  },
+  "status": "complete_verified",
+  "updated_at": "2026-11-08T02:51:12.113038+00:00"
+}
