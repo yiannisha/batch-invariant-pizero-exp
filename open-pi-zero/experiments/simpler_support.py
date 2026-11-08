@@ -210,6 +210,15 @@ class RemoteSimplerEnv:
         )
         return result["observation"], result["info"]
 
+    def capture_snapshot(self) -> dict:
+        return self._request({"command": "capture_snapshot"})
+
+    def restore_snapshot(self) -> dict:
+        return self._request({"command": "restore_snapshot"})
+
+    def inspect_state(self) -> dict:
+        return self._request({"command": "inspect_state"})
+
     def step(self, action):
         # Plain lists keep the protocol compatible between NumPy 1.x in the
         # simulator and NumPy 2.x in the policy environment.
